@@ -1239,7 +1239,8 @@ public class StatEffect {
     }
 
     public int getBuffLocalDuration() {
-        return !GameConfig.getServerBoolean("use_buff_everlasting") ? duration : Integer.MAX_VALUE;
+        // mod: buff 时间为 3倍
+        return !GameConfig.getServerBoolean("use_buff_everlasting") ? Math.min(duration * 3, Integer.MAX_VALUE) : Integer.MAX_VALUE;
     }
 
     public void silentApplyBuff(Character chr, long localStartTime) {

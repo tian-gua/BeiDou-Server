@@ -1128,9 +1128,15 @@ public class ItemInformationProvider {
                     // 如果不是清洁卷轴，则处理升级插槽和等级
                     if (!ItemConstants.isCleanSlate(scrollId)) {
                         if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {   // 处理修饰卷轴不消耗插槽的问题
-                            nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1)); // 减少一个升级插槽
+                            // mod: 砸卷成功不减插槽
+                            // nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1)); // 减少一个升级插槽
                         }
-                        nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
+                         nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
+
+                        // mod: 等级达到100级后不再砸卷
+                        if (nEquip.getLevel() >= 100) {
+                            nEquip.setUpgradeSlots(0);
+                        }
                     }
                 } else {
                     // 卷轴使用失败的情况

@@ -27,6 +27,7 @@ import org.gms.client.*;
 import org.gms.client.inventory.Item;
 import org.gms.client.inventory.ItemFactory;
 import org.gms.client.inventory.Pet;
+import org.gms.client.keybind.KeyBinding;
 import org.gms.config.GameConfig;
 import org.gms.constants.game.GameConstants;
 import org.gms.constants.game.NextLevelType;
@@ -45,6 +46,7 @@ import org.gms.net.server.guild.GuildPackets;
 import org.gms.net.server.world.Party;
 import org.gms.net.server.world.PartyCharacter;
 import org.gms.service.GachaponService;
+import org.gms.util.I18nUtil;
 import org.gms.util.packets.WeddingPackets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1443,5 +1445,36 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         nextLevelContext.setLevelType(NextLevelType.SEND_YES_NO);
         nextLevelContext.setLastLevel(noLevel);
         nextLevelContext.setNextLevel(yesLevel);
+    }
+
+    public void new_keyboard_skill(int key, int type, int skillId) {
+        Skill skill = SkillFactory.getSkill(skillId);
+        this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+        this.c.getPlayer().changeKeybinding(key, new KeyBinding(type, skillId));
+        this.c.getPlayer().sendKeymap();
+        this.c.getPlayer().saveCharToDB();
+    }
+
+    public void max_skill() {
+        Character player = this.c.getPlayer();
+        for (Data skill_ : DataProviderFactory.getDataProvider(WZFiles.STRING).getData("Skill.img").getChildren()) {
+            try {
+                Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+                player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+            } catch (Exception e) {
+                log.error("Error while maxing skill with id {}", skill_.getName());
+                break;
+            }
+        }
+
+        if (player.getJob().isA(Job.ARAN1) || player.getJob().isA(Job.LEGEND)) {
+            Skill skill = SkillFactory.getSkill(5001005);
+            player.changeSkillLevel(skill, (byte) -1, -1, -1);
+        } else {
+            Skill skill = SkillFactory.getSkill(21001001);
+            player.changeSkillLevel(skill, (byte) -1, -1, -1);
+        }
+
+        player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
     }
 }

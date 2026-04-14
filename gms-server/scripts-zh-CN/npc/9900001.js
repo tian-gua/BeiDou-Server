@@ -48,7 +48,7 @@ function action(mode, type, selection) {
         text += " \r\n\r\n";
         text += "#L0#新人福利#l \t #L1#每日签到#l \t #L2#在线奖励#l\r\n";
         text += "#L3#传送自由#l \t #L4#爆率一览#l \t #L5#超级传送#l\r\n";
-        text += "#L6#删除道具#l\r\n";
+        text += "#L6#删除道具#l \t #L8#技能全满#l \t #L7#学二段跳#l\r\n";
         if (cm.getPlayer().isGM()) {
             text += "\r\n\r\n";
             text += "\t\t\t\t#r=====以下内容仅GM可见=====\r\n";
@@ -88,6 +88,12 @@ function doSelect(selection) {
             break;
         case 6:
             openNpc("一键删除道具");
+            break;
+        case 7:
+            cm.new_keyboard_skill(57, 1, 14101004)
+            break;
+        case 8:
+            cm.max_skill(57, 1, 14101004)
             break;
         // GM功能
         case 61:

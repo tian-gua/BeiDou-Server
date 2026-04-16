@@ -55,7 +55,7 @@ public class MobVacHandler {
                 }
 
                 for (Monster monster : vacMap.getAllMonsters()) {
-                    vacMap.moveMonster(monster, vacPosition);
+                    monster.resetMobPosition(vacPosition);
                 }
                 try {
                     Thread.sleep(1000);

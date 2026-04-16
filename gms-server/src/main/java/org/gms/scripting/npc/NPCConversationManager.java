@@ -59,8 +59,6 @@ import org.gms.server.SkillbookInformationProvider.SkillBookEntry;
 import org.gms.server.events.gm.Event;
 import org.gms.server.expeditions.Expedition;
 import org.gms.server.expeditions.ExpeditionType;
-import org.gms.server.gachapon.Gachapon;
-import org.gms.server.gachapon.Gachapon.GachaponItem;
 import org.gms.server.life.LifeFactory;
 import org.gms.server.life.PlayerNPC;
 import org.gms.server.maps.MapManager;

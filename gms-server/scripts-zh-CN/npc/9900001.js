@@ -102,8 +102,7 @@ function doSelect(selection) {
             cm.dispose();
             break;
         case 9:
-            cm.dispose();
-            cm.openShopNPC(9090000);
+            cm.openShopNPC(1338);
             cm.dispose();
             break;
         case 98:

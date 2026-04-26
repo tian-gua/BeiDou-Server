@@ -348,6 +348,20 @@ public class Equip extends Item {
         stats.add(new Pair<>(name, maxUpgrade));
     }
 
+    /** 新的装备升级逻辑，每一级随机 */
+    private Pair<StatUpgrade, Integer> randomUpgrade(StatUpgrade name, int currentVal, int minUpgrade, int maxUpgrade, boolean decrease) {
+        int randomVal = (int) (Math.random() * (maxUpgrade - minUpgrade + 1)) + minUpgrade;
+        if (decrease) {
+            if (randomVal > currentVal) {
+                return new Pair<>(name, -currentVal); // 不允许超过当前值的减少
+            } else {
+                return new Pair<>(name, -randomVal);
+            }
+        } else {
+            return new Pair<>(name, randomVal);
+        }
+    }
+
     /**
      * 尝试为单位插槽添加升级属性（默认10%成功率）
      * @private
@@ -399,48 +413,62 @@ public class Equip extends Item {
             }
         }
     }
-    private void improveDefaultStats(List<Pair<StatUpgrade, Integer>> stats) {
+    private void improveDefaultStats(List<Pair<StatUpgrade, Integer>> stats, boolean decrease) {
         if (dex > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incDEX, dex, true);
+            // getUnitStatUpgrade(stats, StatUpgrade.incDEX, dex, true);
+            stats.add(randomUpgrade(StatUpgrade.incDEX, dex, 1, 5, decrease));
         }
         if (str > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incSTR, str, true);
+            // getUnitStatUpgrade(stats, StatUpgrade.incSTR, str, true);
+            stats.add(randomUpgrade(StatUpgrade.incSTR, str, 1, 5, decrease));
         }
         if (_int > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incINT, _int, true);
+            // getUnitStatUpgrade(stats, StatUpgrade.incINT, _int, true);
+            stats.add(randomUpgrade(StatUpgrade.incINT, _int, 1, 5, decrease));
         }
         if (luk > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incLUK, luk, true);
+            // getUnitStatUpgrade(stats, StatUpgrade.incLUK, luk, true);
+            stats.add(randomUpgrade(StatUpgrade.incLUK, luk, 1, 5, decrease));
         }
         if (hp > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incMHP, hp, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incMHP, hp, false);
+            stats.add(randomUpgrade(StatUpgrade.incMHP, hp, 10, 50, decrease));
         }
         if (mp > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incMMP, mp, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incMMP, mp, false);
+            stats.add(randomUpgrade(StatUpgrade.incMMP, mp, 10, 50, decrease));
         }
         if (watk > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incPAD, watk, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incPAD, watk, false);
+            stats.add(randomUpgrade(StatUpgrade.incPAD, watk, 1, 3, decrease));
         }
         if (matk > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incMAD, matk, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incMAD, matk, false);
+            stats.add(randomUpgrade(StatUpgrade.incMAD, matk, 1, 3, decrease));
         }
         if (wdef > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incPDD, wdef, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incPDD, wdef, false);
+            stats.add(randomUpgrade(StatUpgrade.incPDD, wdef, 1, 3, decrease));
         }
         if (mdef > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incMDD, mdef, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incMDD, mdef, false);
+            stats.add(randomUpgrade(StatUpgrade.incMDD, mdef, 1, 3, decrease));
         }
         if (avoid > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incEVA, avoid, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incEVA, avoid, false);
+            stats.add(randomUpgrade(StatUpgrade.incEVA, avoid, 1, 3, decrease));
         }
         if (acc > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incACC, acc, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incACC, acc, false);
+            stats.add(randomUpgrade(StatUpgrade.incACC, acc, 1, 3, decrease));
         }
         if (speed > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incSpeed, speed, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incSpeed, speed, false);
+            stats.add(randomUpgrade(StatUpgrade.incSpeed, speed, 1, 3, decrease));
         }
         if (jump > 0) {
-            getUnitStatUpgrade(stats, StatUpgrade.incJump, jump, false);
+            // getUnitStatUpgrade(stats, StatUpgrade.incJump, jump, false);
+            stats.add(randomUpgrade(StatUpgrade.incJump, jump, 1, 3, decrease));
         }
     }
 
@@ -519,9 +547,10 @@ public class Equip extends Item {
                     break;
                 default: // 处理普通属性
                     int statUp = handleStatUpgrade(type, value, maxStat);
-                    if (statUp > 0) {
-                        lvupStr.append(getStatMessage(type, statUp)).append("; ");
-                    }
+//                    if (statUp > 0) {
+//                        lvupStr.append(getStatMessage(type, statUp)).append("; ");
+//                    }
+                    lvupStr.append(getStatMessage(type, statUp)).append("; ");
                     break;
             }
         }
@@ -539,9 +568,10 @@ public class Equip extends Item {
     private int handleStatUpgrade(StatUpgrade type, int value, int maxStat) {
         int currentStat = getCurrentStat(type); // 获取当前属性值
         int statUp = Math.min(value, maxStat - currentStat); // 计算实际增加值，不超过最大值
-        if (statUp > 0) {
-            setCurrentStat(type, currentStat + statUp); // 更新属性值
-        }
+//        if (statUp > 0) {
+//            setCurrentStat(type, currentStat + statUp); // 更新属性值
+//        }
+        setCurrentStat(type, currentStat + statUp); // 更新属性值
         return statUp;
     }
 
@@ -603,14 +633,29 @@ public class Equip extends Item {
      */
     private String getStatMessage(StatUpgrade type, int value) {
         String messageKey = "Equip.gainStats." + type.name().substring(3); // 从 incDEX 中提取 DEX
-        return I18nUtil.getMessage(messageKey) + "+" + value;
+        if (value > 0) {
+            return I18nUtil.getMessage(messageKey) + "+" + value;
+        } else {
+            return I18nUtil.getMessage(messageKey) + value; // value 已经是负数，直接显示
+        }
     }
 
     /**
      * 处理装备升级的逻辑，包括属性提升、升级槽增加、金锤子减少等，并通知客户端更新装备状态
      * @param c 触发升级的客户端
      */
-    private void gainLevel(Client c) {
+    public void gainLevel(Client c, boolean useChaos) {
+        boolean decrease = false;
+        if (useChaos) {
+            // 随机 二分之一的概率
+            decrease = Randomizer.nextBoolean();
+            if (decrease) {
+                c.getPlayer().message("倒霉，混沌卷轴降低了装备的属性！");  // 提示玩家属性降低
+            } else {
+                c.getPlayer().message("幸运，混沌卷轴提升了装备的属性！");  // 提示玩家属性提升
+            }
+        }
+
         List<Pair<StatUpgrade, Integer>> stats = new LinkedList<>(); // 初始化属性升级列表
         int equipLevel = ii.getEquipLevelReq(getItemId()); // 获取装备要求等级
 
@@ -625,17 +670,21 @@ public class Equip extends Item {
 
         if (stats.isEmpty()) {// 如果属性列表为空，则生成默认属性升级列表
             isUpgradeable = false; // 标记装备不可升级
-            improveDefaultStats(stats); // 生成默认属性升级列表
+            improveDefaultStats(stats, decrease); // 生成默认属性升级列表
         }
         UpgradeSlotProcessing(stats,equipLevel);    // 砸卷次数和减少金锤子次数判断
         if (isUpgradeable && stats.isEmpty()) {// 如果装备仍可升级且属性列表为空，则继续生成属性升级列表
             while (stats.isEmpty()) {
-                improveDefaultStats(stats);// 生成默认属性升级列表
+                improveDefaultStats(stats, false);// 生成默认属性升级列表
                 UpgradeSlotProcessing(stats,equipLevel);// 砸卷次数和减少金锤子次数判断
             }
         }
 
-        itemLevel++; // 提升装备等级
+        // mod: 使用混沌卷轴升级，不需要提升装备等级，直接计算属性提升和槽位增加即可
+        if (!useChaos) {
+            itemLevel++; // 提升装备等级
+        }
+
 
         String lvupStr = I18nUtil.getMessage("Equip.gainStats.lvupStr", ii.getName(this.getItemId()), itemLevel) + "; ";  // 生成等级提升的提示消息
 
@@ -720,7 +769,7 @@ public class Equip extends Item {
         if (itemExp >= expNeeded) {// 判断是否需要升级
             while (itemExp >= expNeeded) {
                 itemExp -= expNeeded;
-                gainLevel(c); // 升级装备
+                gainLevel(c, false); // 升级装备
 
                 if (itemLevel >= equipMaxLevel || !GameConfig.getServerBoolean("use_equipment_level_up_continuous")) {// 如果达到最大等级或者不允许连续升级，重置经验值并退出循环
                     itemExp = 0.0f;

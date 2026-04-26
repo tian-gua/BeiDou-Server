@@ -1454,14 +1454,15 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
     }
 
     public void maxSkill() {
-        Character player = this.c.getPlayer();
+        Character player = getPlayer();
         for (Data skill_ : DataProviderFactory.getDataProvider(WZFiles.STRING).getData("Skill.img").getChildren()) {
             try {
                 Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
                 player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
-            } catch (Exception e) {
-                log.error("Error while maxing skill with id {}", skill_.getName());
+            } catch (NumberFormatException nfe) {
+                nfe.printStackTrace();
                 break;
+            } catch (NullPointerException npe) {
             }
         }
 
@@ -1478,5 +1479,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
     public void mobVac(boolean on) {
         MobVacHandler.mobVac(on, getPlayer());
+    }
+
+    public void resetMobVacPosition() {
+        MobVacHandler.resetPosition(getPlayer());
     }
 }

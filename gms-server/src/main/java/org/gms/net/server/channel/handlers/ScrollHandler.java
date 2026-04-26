@@ -105,7 +105,7 @@ public final class ScrollHandler extends AbstractPacketHandler {
                     }
                 }
 
-                Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, scroll.getItemId(), whiteScroll, 0, chr.isGM()); // 使用卷轴升级装备
+                Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, scroll.getItemId(), whiteScroll, 0, chr.isGM(), c); // 使用卷轴升级装备
                 ScrollResult scrollSuccess = Equip.ScrollResult.FAIL; // 默认设置为失败
                 if (scrolled == null) {
                     scrollSuccess = Equip.ScrollResult.CURSE; // 卷轴诅咒装备

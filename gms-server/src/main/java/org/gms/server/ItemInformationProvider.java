@@ -756,7 +756,7 @@ public class ItemInformationProvider {
             int temp;
             short curStr, curDex, curInt, curLuk, curWatk, curWdef, curMatk, curMdef, curAcc, curAvoid, curSpeed, curJump, curHp, curMp;
 
-            if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
+            if (GameConfig.getServerBoolean("")) {
                 curStr = nEquip.getStr();
                 curDex = nEquip.getDex();
                 curInt = nEquip.getInt();
@@ -1062,7 +1062,7 @@ public class ItemInformationProvider {
         return freeUpgradeCount + appliedScrollCount < totalUpgradeCount + viciousCount;
     }
 
-    public Item scrollEquipWithId(Item equip, int scrollId, boolean usingWhiteScroll, int vegaItemId, boolean isGM) {
+    public Item scrollEquipWithId(Item equip, int scrollId, boolean usingWhiteScroll, int vegaItemId, boolean isGM, Client c) {
         // 检查是否是游戏管理员且配置中启用了完美GM卷轴功能
         boolean assertGM = (isGM && GameConfig.getServerBoolean("use_perfect_gm_scroll"));
 
@@ -1092,8 +1092,11 @@ public class ItemInformationProvider {
                         break;
                 }
 
+                boolean isChaos = (scrollId == ItemId.CHAOS_SCROll_60 && c != null);
+
                 // 判断是否成功应用卷轴效果（根据成功率和GM状态）
-                if (assertGM || rollSuccessChance(prop)) {
+                // mod: 混沌卷轴 100 % 成功
+                if (assertGM || rollSuccessChance(prop) || isChaos) {
                     short flag = nEquip.getFlag(); // 获取装备的标志位
 
                     // 根据卷轴ID应用不同的效果
@@ -1117,7 +1120,12 @@ public class ItemInformationProvider {
                         case ItemId.CHAOS_SCROll_60:
                         case ItemId.LIAR_TREE_SAP:
                         case ItemId.MAPLE_SYRUP:
-                            scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
+                            if (!isChaos) {
+                                scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
+                            } else {
+                                // 使用新的混沌卷轴逻辑
+                                nEquip.gainLevel(c, true);
+                            }
                             break;
 
                         default:
@@ -1128,15 +1136,21 @@ public class ItemInformationProvider {
                     // 如果不是清洁卷轴，则处理升级插槽和等级
                     if (!ItemConstants.isCleanSlate(scrollId)) {
                         if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {   // 处理修饰卷轴不消耗插槽的问题
-                            // mod: 砸卷成功不减插槽
-                            // nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1)); // 减少一个升级插槽
+                            // mod: 非混沌卷轴成功时才消耗插槽
+                            if (!isChaos) {
+                                nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1)); // 减少一个升级插槽
+                            }
                         }
-                         nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
+
+                        // mod: 非混沌卷轴成功时才提升等级
+                        if (!isChaos) {
+                            nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
+                        }
 
                         // mod: 等级达到100级后不再砸卷
-                        if (nEquip.getLevel() >= 100) {
-                            nEquip.setUpgradeSlots(0);
-                        }
+                        // if (nEquip.getLevel() >= 100) {
+                        //     nEquip.setUpgradeSlots(0);
+                        // }
                     }
                 } else {
                     // 卷轴使用失败的情况

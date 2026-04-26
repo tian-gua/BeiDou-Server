@@ -8,7 +8,6 @@ import java.awt.*;
 
 public class MobVacHandler {
 
-    public static volatile boolean status;
     public static volatile int mapId;
     public static Thread t;
     private static volatile boolean running; // 标志位，用于控制线程运行状态
@@ -17,28 +16,35 @@ public class MobVacHandler {
     private static volatile MapleMap vacMap = null;
 
     public synchronized static void mobVac(boolean on, Character player) {
-        if (on && status) {
+        if (on && running) {
             player.dropMessage("吸怪已开启，无需重复开启。");
             return;
         }
 
-        if (!on && !status) {
+        if (!on && !running) {
             player.dropMessage("吸怪已关闭，无需重复关闭。");
             return;
         }
 
-        if (on && !status) {
-            status = true;
+        if (on && !running) {
             start(player);
             player.dropMessage("吸怪已开启。");
             return;
         }
 
-        if (!on && status) {
-            status = false;
+        if (!on && running) {
             stop(); // 调用 stop 方法停止线程
             player.dropMessage("吸怪已关闭。");
         }
+    }
+
+    public  synchronized static void resetPosition(Character player) {
+        if (!running) {
+            player.dropMessage("吸怪未开启，无法重置位置。");
+            return;
+        }
+        vacPosition = player.getPosition();
+        player.dropMessage("吸怪位置已重置。");
     }
 
     public synchronized static void start(Character player) {
@@ -49,8 +55,9 @@ public class MobVacHandler {
             while (running) {
                 // 在这里实现线程的主要逻辑
                 var allPlayer = vacMap.getAllPlayer();
-                if (allPlayer.size() != 1 && allPlayer.getFirst().getObjectId() != player.getObjectId()) {
+                if (allPlayer.size() != 1 || allPlayer.getFirst().getObjectId() != player.getObjectId()) {
                     running = false;
+                    player.dropMessage("吸怪已关闭。");
                     break; // 如果地图上没有玩家了，或者地图上有玩家但不是当前玩家，则停止线程
                 }
 
@@ -70,6 +77,8 @@ public class MobVacHandler {
     public synchronized static void stop() {
         running = false; // 设置标志位为 false，通知线程停止
         if (t != null) {
+            // 如果线程正在sleep，中断它以立即响应flag变化
+            t.interrupt();
             try {
                 t.join(); // 等待线程结束
             } catch (InterruptedException e) {

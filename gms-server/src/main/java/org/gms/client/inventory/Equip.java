@@ -644,13 +644,17 @@ public class Equip extends Item {
      * 处理装备升级的逻辑，包括属性提升、升级槽增加、金锤子减少等，并通知客户端更新装备状态
      * @param c 触发升级的客户端
      */
-    public void gainLevel(Client c, boolean useChaos) {
+    public void gainLevel(Client c, boolean useChaos, boolean usingWhiteScroll) {
         boolean decrease = false;
         if (useChaos) {
             // 随机 二分之一的概率
             decrease = Randomizer.nextBoolean();
             if (decrease) {
                 c.getPlayer().message("倒霉，混沌卷轴降低了装备的属性！");  // 提示玩家属性降低
+                if (usingWhiteScroll) {
+                    c.getPlayer().message("幸运，白色卷轴保护了装备的属性不被降低！");  // 提示玩家白色卷轴保护了属性
+                    return;
+                }
             } else {
                 c.getPlayer().message("幸运，混沌卷轴提升了装备的属性！");  // 提示玩家属性提升
             }
@@ -769,7 +773,7 @@ public class Equip extends Item {
         if (itemExp >= expNeeded) {// 判断是否需要升级
             while (itemExp >= expNeeded) {
                 itemExp -= expNeeded;
-                gainLevel(c, false); // 升级装备
+                gainLevel(c, false, false); // 升级装备
 
                 if (itemLevel >= equipMaxLevel || !GameConfig.getServerBoolean("use_equipment_level_up_continuous")) {// 如果达到最大等级或者不允许连续升级，重置经验值并退出循环
                     itemExp = 0.0f;

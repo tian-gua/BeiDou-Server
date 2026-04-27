@@ -35,6 +35,7 @@ import org.gms.constants.id.MapId;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.constants.string.LanguageConstants;
 import org.gms.manager.ServerManager;
+import org.gms.melon.LegalMobVacHandler;
 import org.gms.melon.MobVacHandler;
 import org.gms.model.pojo.NextLevelContext;
 import org.gms.net.server.Server;
@@ -1445,6 +1446,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         nextLevelContext.setNextLevel(yesLevel);
     }
 
+    public void learnSkill(int skillId) {
+        Skill skill = SkillFactory.getSkill(skillId);
+        this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+    }
+
     public void newKeyboardSkill(int key, int type, int skillId) {
         Skill skill = SkillFactory.getSkill(skillId);
         this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
@@ -1483,5 +1489,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
     public void resetMobVacPosition() {
         MobVacHandler.resetPosition(getPlayer());
+    }
+
+    public void legalMobVac() {
+        LegalMobVacHandler.mobVac(getPlayer());
     }
 }

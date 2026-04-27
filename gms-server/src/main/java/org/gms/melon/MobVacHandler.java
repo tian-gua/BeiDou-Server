@@ -44,12 +44,14 @@ public class MobVacHandler {
             return;
         }
         vacPosition = player.getPosition();
+        vacMap.setVacPoint(vacPosition);
         player.dropMessage("吸怪位置已重置。");
     }
 
     public synchronized static void start(Character player) {
         vacPosition = player.getPosition();
         vacMap = player.getMap();
+        vacMap.setVacPoint(vacPosition);
         running = true; // 启动线程时设置标志位为 true
         t = new Thread(() -> {
             while (running) {
@@ -57,12 +59,16 @@ public class MobVacHandler {
                 var allPlayer = vacMap.getAllPlayer();
                 if (allPlayer.size() != 1 || allPlayer.getFirst().getObjectId() != player.getObjectId()) {
                     running = false;
+                    vacMap.setVacPoint(null);
+                    vacPosition = null;
                     player.dropMessage("吸怪已关闭。");
                     break; // 如果地图上没有玩家了，或者地图上有玩家但不是当前玩家，则停止线程
                 }
 
                 for (Monster monster : vacMap.getAllMonsters()) {
-                    monster.resetMobPosition(vacPosition);
+                    if (!monster.isBoss() && monster.isAlive()) {
+                        monster.resetMobPosition(vacPosition);
+                    }
                 }
                 try {
                     Thread.sleep(1000);
@@ -76,6 +82,8 @@ public class MobVacHandler {
 
     public synchronized static void stop() {
         running = false; // 设置标志位为 false，通知线程停止
+        vacPosition = null;
+        vacMap.setVacPoint(null); // 清除地图上的吸怪点
         if (t != null) {
             // 如果线程正在sleep，中断它以立即响应flag变化
             t.interrupt();

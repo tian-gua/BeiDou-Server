@@ -1124,7 +1124,7 @@ public class ItemInformationProvider {
                                 scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
                             } else {
                                 // 使用新的混沌卷轴逻辑
-                                nEquip.gainLevel(c, true);
+                                nEquip.gainLevel(c, true, usingWhiteScroll);
                             }
                             break;
 

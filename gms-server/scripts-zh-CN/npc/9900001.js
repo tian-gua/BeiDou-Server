@@ -40,6 +40,7 @@ function action(mode, type, selection) {
         return;
     }
 
+    // #拍卖 NPC#
     if (status === 0) {
         let text = OldTitle;
         text += "当前点券：" + cm.getPlayer().getCashShop().getCash(1) + "\r\n";
@@ -48,7 +49,7 @@ function action(mode, type, selection) {
         text += "当前金币：" + cm.getPlayer().getMeso() + "\r\n";
         text += " \r\n\r\n";
         // text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
-        text += "#L3#传送自由#l \t #L70#学习技能#l \t #L1001#满技能#l\r\n";
+        text += "#L3#传送自由#l \t #L1002#学二段跳#l \t #L1001#满技能#l\r\n";
         text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
         text += "#L0#新人福利#l \t #L1#每日签到#l\r\n";
         // text += "#L999#测试脚本>>>未上线#l \t \r\n";
@@ -131,6 +132,10 @@ function doSelect(selection) {
             break;
         case 1001:
             cm.maxSkill();
+            break;
+        case 1002:
+            cm.newKeyboardSkill(57, 1, 4111006) // 二段跳 空格
+            cm.dispose();
             break;
         default:
             cm.sendOk("该功能暂不支持，敬请期待！");

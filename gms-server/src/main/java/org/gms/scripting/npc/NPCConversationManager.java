@@ -27,6 +27,7 @@ import org.gms.client.*;
 import org.gms.client.inventory.Item;
 import org.gms.client.inventory.ItemFactory;
 import org.gms.client.inventory.Pet;
+import org.gms.client.keybind.KeyBinding;
 import org.gms.config.GameConfig;
 import org.gms.constants.game.GameConstants;
 import org.gms.constants.game.NextLevelType;
@@ -1469,5 +1470,13 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 //        }
 
         player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
+    }
+
+    public void newKeyboardSkill(int key, int type, int skillId) {
+        Skill skill = SkillFactory.getSkill(skillId);
+        this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+        this.c.getPlayer().changeKeybinding(key, new KeyBinding(type, skillId));
+        this.c.getPlayer().sendKeymap();
+        this.c.getPlayer().saveCharToDB();
     }
 }

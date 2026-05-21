@@ -21,6 +21,7 @@
  */
 package org.gms.server;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gms.client.Character;
 import org.gms.client.Client;
 import org.gms.client.Job;
@@ -1092,7 +1093,7 @@ public class ItemInformationProvider {
                         break;
                 }
 
-                // 混沌卷轴不扣减升级槽
+                // #混沌卷轴不扣减升级槽#
                 if (scrollId == ItemId.CHAOS_SCROll_60) {
                     nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
                 }
@@ -1123,6 +1124,20 @@ public class ItemInformationProvider {
                         case ItemId.LIAR_TREE_SAP:
                         case ItemId.MAPLE_SYRUP:
                             scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
+
+                            // #自定义星级#
+                            if (StringUtils.isBlank(nEquip.getOwner())) {
+                                nEquip.setOwner("[1]星");
+                            } else {
+                                String owner = nEquip.getOwner();
+                                try {
+                                    int star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
+                                    nEquip.setOwner("[" + (star + 1) + "]星");
+                                } catch (Exception e) {
+                                    log.error("更新星级失败: {}", owner);
+                                }
+                            }
+
                             break;
 
                         default:

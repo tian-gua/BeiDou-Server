@@ -97,4 +97,8 @@ public class Skill {
     public void addLevelEffect(StatEffect effect) {
         effects.add(effect);
     }
+
+    public int getJob() {
+        return job;
+    }
 }

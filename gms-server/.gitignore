@@ -5,3 +5,6 @@ logs
 src/main/resources/static
 docker-db-data
 .idea
+
+makefile
+mod.txt

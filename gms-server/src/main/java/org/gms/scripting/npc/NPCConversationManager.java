@@ -45,6 +45,7 @@ import org.gms.net.server.guild.GuildPackets;
 import org.gms.net.server.world.Party;
 import org.gms.net.server.world.PartyCharacter;
 import org.gms.service.GachaponService;
+import org.gms.util.I18nUtil;
 import org.gms.util.packets.WeddingPackets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1443,5 +1444,30 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         nextLevelContext.setLevelType(NextLevelType.SEND_YES_NO);
         nextLevelContext.setLastLevel(noLevel);
         nextLevelContext.setNextLevel(yesLevel);
+    }
+
+    public void maxSkill() {
+        Character player = getPlayer();
+        for (Data skill_ : DataProviderFactory.getDataProvider(WZFiles.STRING).getData("Skill.img").getChildren()) {
+            try {
+                Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+                if (skill.getJob() == player.getJob().getId()) {
+                    player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+                }
+
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+
+//        if (player.getJob().isA(Job.ARAN1) || player.getJob().isA(Job.LEGEND)) {
+//            Skill skill = SkillFactory.getSkill(5001005);
+//            player.changeSkillLevel(skill, (byte) -1, -1, -1);
+//        } else {
+//            Skill skill = SkillFactory.getSkill(21001001);
+//            player.changeSkillLevel(skill, (byte) -1, -1, -1);
+//        }
+
+        player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
     }
 }

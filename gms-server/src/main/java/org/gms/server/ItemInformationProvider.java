@@ -911,7 +911,7 @@ public class ItemInformationProvider {
 
                 if (nEquip.getHp() > 0) {
                     if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                        temp = curHp + chscrollRandomizedStat(range);
+                        temp = curHp + chscrollRandomizedStat(range * 10);
                     } else {
                         temp = nEquip.getHp() + chscrollRandomizedStat(range);
                     }
@@ -921,7 +921,7 @@ public class ItemInformationProvider {
 
                 if (nEquip.getMp() > 0) {
                     if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                        temp = curMp + chscrollRandomizedStat(range);
+                        temp = curMp + chscrollRandomizedStat(range * 10);
                     } else {
                         temp = nEquip.getMp() + chscrollRandomizedStat(range);
                     }
@@ -1090,6 +1090,11 @@ public class ItemInformationProvider {
                     case ItemId.CHAOS_SCROll_60:
                         prop = 100.0f;
                         break;
+                }
+
+                // 混沌卷轴不扣减升级槽
+                if (scrollId == ItemId.CHAOS_SCROll_60) {
+                    nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
                 }
 
                 // 判断是否成功应用卷轴效果（根据成功率和GM状态）

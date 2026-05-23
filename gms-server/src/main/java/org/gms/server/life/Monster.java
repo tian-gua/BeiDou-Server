@@ -2208,4 +2208,8 @@ public class Monster extends AbstractLoadedLife {
 
         this.getMap().dismissRemoveAfter(this);
     }
+
+    public List<MonsterStatus> getAlreadyBuffed() {
+        return alreadyBuffed;
+    }
 }

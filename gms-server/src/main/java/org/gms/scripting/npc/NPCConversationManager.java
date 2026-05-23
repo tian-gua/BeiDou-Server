@@ -1481,7 +1481,8 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 //            Skill skill = SkillFactory.getSkill(21001001);
 //            player.changeSkillLevel(skill, (byte) -1, -1, -1);
 //        }
-
+        // 清空技能点
+        Arrays.fill(player.getRemainingSps(), 0);
         player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
     }
 

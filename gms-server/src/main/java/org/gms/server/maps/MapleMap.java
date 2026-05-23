@@ -3737,7 +3737,6 @@ public class MapleMap {
                     }
                     spawnMonster(monster);
                     spawned++;
-
                     if (spawned >= numShouldSpawn) {
                         break;
                     }

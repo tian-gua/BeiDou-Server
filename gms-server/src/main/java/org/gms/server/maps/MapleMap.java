@@ -191,6 +191,8 @@ public class MapleMap {
 
     private final Lock lootLock = new ReentrantLock(true);
 
+    private Point vacPoint = null;
+
     // due to the nature of loadMapFromWz (synchronized), sole function that calls 'generateMapDropRangeCache', this lock remains optional.
     private static final Lock bndLock = new ReentrantLock(true);
 
@@ -3728,7 +3730,12 @@ public class MapleMap {
             short spawned = 0;
             for (SpawnPoint spawnPoint : randomSpawn) {
                 if (spawnPoint.shouldSpawn()) {
-                    spawnMonster(spawnPoint.getMonster());
+                    // mod: 吸怪
+                    var monster = spawnPoint.getMonster();
+                    if (vacPoint != null && !monster.isBoss()) {
+                        monster.setPosition(vacPoint);
+                    }
+                    spawnMonster(monster);
                     spawned++;
 
                     if (spawned >= numShouldSpawn) {
@@ -4612,4 +4619,7 @@ public class MapleMap {
         this.timeExpand = timeExpand;
     }
 
+    public void setVacPoint(Point vacPoint) {
+        this.vacPoint = vacPoint;
+    }
 }

@@ -641,8 +641,10 @@ public class ItemInformationProvider {
     }
 
     private static short chscrollRandomizedStat(int range) {
-        return (short) Randomizer.rand(-range, range);
+//        return (short) Randomizer.rand(-range, range);
+        return (short) Randomizer.rand(1, range);
     }
+
 
     public void scrollOptionEquipWithChaos(Equip nEquip, int range, boolean option) {
         // option: watk, matk, wdef, mdef, spd, jump, hp, mp
@@ -1032,14 +1034,14 @@ public class ItemInformationProvider {
             }
             if (nEquip.getHp() > 0) {
                 if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                    nEquip.setHp(getMaximumShortMaxIfOverflow(nEquip.getHp(), (nEquip.getHp() + chscrollRandomizedStat(range))));
+                    nEquip.setHp(getMaximumShortMaxIfOverflow(nEquip.getHp(), (nEquip.getHp() + chscrollRandomizedStat(range * 10))));
                 } else {
                     nEquip.setHp(getMaximumShortMaxIfOverflow(0, (nEquip.getHp() + chscrollRandomizedStat(range))));
                 }
             }
             if (nEquip.getMp() > 0) {
                 if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                    nEquip.setMp(getMaximumShortMaxIfOverflow(nEquip.getMp(), (nEquip.getMp() + chscrollRandomizedStat(range))));
+                    nEquip.setMp(getMaximumShortMaxIfOverflow(nEquip.getMp(), (nEquip.getMp() + chscrollRandomizedStat(range * 10))));
                 } else {
                     nEquip.setMp(getMaximumShortMaxIfOverflow(0, (nEquip.getMp() + chscrollRandomizedStat(range))));
                 }
@@ -1093,11 +1095,6 @@ public class ItemInformationProvider {
                         break;
                 }
 
-                // #混沌卷轴不扣减升级槽#
-                if (scrollId == ItemId.CHAOS_SCROll_60) {
-                    nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
-                }
-
                 // 判断是否成功应用卷轴效果（根据成功率和GM状态）
                 if (assertGM || rollSuccessChance(prop)) {
                     short flag = nEquip.getFlag(); // 获取装备的标志位
@@ -1125,21 +1122,24 @@ public class ItemInformationProvider {
                         case ItemId.MAPLE_SYRUP:
                             scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
 
-                            // #自定义星级#
-                            if (StringUtils.isBlank(nEquip.getOwner())) {
-                                nEquip.setOwner("[1]星");
-                            } else {
-                                String owner = nEquip.getOwner();
-                                try {
-                                    int star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
-                                    nEquip.setOwner("[" + (star + 1) + "]星");
-                                } catch (Exception e) {
-                                    log.error("更新星级失败: {}", owner);
+                            // #混沌卷轴不扣减升级槽#
+                            if (scrollId == ItemId.CHAOS_SCROll_60) {
+                                nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
+
+                                // #自定义星级#
+                                if (StringUtils.isBlank(nEquip.getOwner())) {
+                                    nEquip.setOwner("[1]星");
+                                } else {
+                                    String owner = nEquip.getOwner();
+                                    try {
+                                        int star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
+                                        nEquip.setOwner("[" + (star + 1) + "]星");
+                                    } catch (Exception e) {
+                                        log.error("更新星级失败: {}", owner);
+                                    }
                                 }
                             }
-
                             break;
-
                         default:
                             improveEquipStats(nEquip, stats); // 默认情况下提高装备属性
                             break;
@@ -1150,7 +1150,10 @@ public class ItemInformationProvider {
                         if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {   // 处理修饰卷轴不消耗插槽的问题
                             nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1)); // 减少一个升级插槽
                         }
-                        nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
+                        // 混沌卷轴不增加等级
+                        if (scrollId != ItemId.CHAOS_SCROll_60) {
+                            nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
+                        }
                     }
                 } else {
                     // 卷轴使用失败的情况

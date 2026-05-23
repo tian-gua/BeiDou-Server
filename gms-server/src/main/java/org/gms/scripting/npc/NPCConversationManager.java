@@ -32,10 +32,10 @@ import org.gms.config.GameConfig;
 import org.gms.constants.game.GameConstants;
 import org.gms.constants.game.NextLevelType;
 import org.gms.constants.id.MapId;
-import org.gms.constants.id.NpcId;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.constants.string.LanguageConstants;
 import org.gms.manager.ServerManager;
+import org.gms.melon.MobVacHandler;
 import org.gms.model.pojo.NextLevelContext;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
@@ -1447,6 +1447,19 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         nextLevelContext.setNextLevel(yesLevel);
     }
 
+    public void learnSkill(int skillId) {
+        Skill skill = SkillFactory.getSkill(skillId);
+        this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+    }
+
+    public void newKeyboardSkill(int key, int type, int skillId) {
+        Skill skill = SkillFactory.getSkill(skillId);
+        this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+        this.c.getPlayer().changeKeybinding(key, new KeyBinding(type, skillId));
+        this.c.getPlayer().sendKeymap();
+        this.c.getPlayer().saveCharToDB();
+    }
+
     public void maxSkill() {
         Character player = getPlayer();
         for (Data skill_ : DataProviderFactory.getDataProvider(WZFiles.STRING).getData("Skill.img").getChildren()) {
@@ -1472,11 +1485,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
     }
 
-    public void newKeyboardSkill(int key, int type, int skillId) {
-        Skill skill = SkillFactory.getSkill(skillId);
-        this.c.getPlayer().changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
-        this.c.getPlayer().changeKeybinding(key, new KeyBinding(type, skillId));
-        this.c.getPlayer().sendKeymap();
-        this.c.getPlayer().saveCharToDB();
+    public void mobVac(boolean on) {
+        MobVacHandler.mobVac(on, getPlayer());
+    }
+
+    public void resetMobVacPosition() {
+        MobVacHandler.resetPosition(getPlayer());
     }
 }

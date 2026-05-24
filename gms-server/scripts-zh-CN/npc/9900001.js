@@ -50,10 +50,11 @@ function action(mode, type, selection) {
         text += "当前金币：" + cm.getPlayer().getMeso() + "\r\n";
         text += " \r\n\r\n";
         // text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
-        text += "#L3#传送自由#l \t #L1001#满技能#l\r\n";
-        text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
+        text += "#L3#传送自由#l \t #L71#超级传送#l\r\n";
+        text += "#L4#爆率一览#l \t #L2#在线奖励#l\r\n";
         text += "#L0#新人福利#l \t #L1#每日签到#l\r\n";
         text += "\r\n"
+        text += "#L1001#满技能#l \t #L1004#清空技能点#l\r\n"
         text += "#L1003#偷学稳如泰山#l \t #L1002#偷学二段跳#l\r\n"
         // text += "#L999#测试脚本>>>未上线#l \t \r\n";
         text += "\r\n"
@@ -158,6 +159,10 @@ function doSelect(selection) {
             break;
         case 1003:
             cm.newKeyboardSkill(47, 1, 1121002) // 稳如泰山 V
+            cm.dispose();
+            break;
+        case 1004:
+            cm.clearSP();
             cm.dispose();
             break;
         default:

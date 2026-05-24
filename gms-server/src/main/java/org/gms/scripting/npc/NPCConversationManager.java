@@ -1465,6 +1465,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         for (Data skill_ : DataProviderFactory.getDataProvider(WZFiles.STRING).getData("Skill.img").getChildren()) {
             try {
                 Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+                if (skill == null) {
+                    continue;
+                }
                 if (skill.getJob() == player.getJob().getId()) {
                     player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
                 }
@@ -1481,9 +1484,15 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 //            Skill skill = SkillFactory.getSkill(21001001);
 //            player.changeSkillLevel(skill, (byte) -1, -1, -1);
 //        }
-        // 清空技能点
-        Arrays.fill(player.getRemainingSps(), 0);
         player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
+    }
+
+    public void clearSP() {
+        // 清空技能点
+        var sps = getPlayer().getRemainingSps();
+        for (int i = 0; i < sps.length; i++) {
+            getPlayer().setRemainingSp(0, i);
+        }
     }
 
     public void mobVac(boolean on) {

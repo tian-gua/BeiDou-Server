@@ -57,12 +57,12 @@ public class WarpCommand extends Command {
                 return;
             }
 
-            if (!player.isGM()) {
-                if (player.getEventInstance() != null || MiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
-                    player.dropMessage(1, I18nUtil.getMessage("WarpCommand.message5"));
-                    return;
-                }
-            }
+//            if (!player.isGM()) {
+//                if (player.getEventInstance() != null || MiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
+//                    player.dropMessage(1, I18nUtil.getMessage("WarpCommand.message5"));
+//                    return;
+//                }
+//            }
 
             // expedition issue with this command detected thanks to Masterrulax
             player.saveLocationOnWarp();

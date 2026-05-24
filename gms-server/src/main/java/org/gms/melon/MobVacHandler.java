@@ -55,6 +55,10 @@ public class MobVacHandler {
         }
         vacPosition = player.getPosition();
         vacMap.setVacPoint(vacPosition);
+
+        // 清空怪物
+        vacMap.killAllMonsters();
+
         player.dropMessage("吸怪位置已重置。");
     }
 
@@ -76,6 +80,10 @@ public class MobVacHandler {
                                vacMap.setVacPoint(null);
                                vacPosition = null;
                                player.dropMessage("吸怪已关闭。");
+
+                               // 清空怪物
+                               vacMap.killAllMonsters();
+
                                break;
                            }
                         }
@@ -86,6 +94,10 @@ public class MobVacHandler {
                         vacMap.setVacPoint(null);
                         vacPosition = null;
                         player.dropMessage("吸怪已关闭。");
+
+                        // 清空怪物
+                        vacMap.killAllMonsters();
+
                         break; // 如果地图上没有玩家了，或者地图上有玩家但不是当前玩家，则停止线程
                     }
                 }
@@ -125,6 +137,10 @@ public class MobVacHandler {
         running = false; // 设置标志位为 false，通知线程停止
         vacPosition = null;
         vacMap.setVacPoint(null); // 清除地图上的吸怪点
+
+        // 清空怪物
+        vacMap.killAllMonsters();
+
         if (t != null) {
             // 如果线程正在sleep，中断它以立即响应flag变化
             t.interrupt();

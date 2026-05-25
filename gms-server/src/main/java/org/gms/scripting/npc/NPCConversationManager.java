@@ -24,9 +24,8 @@ package org.gms.scripting.npc;
 import lombok.Getter;
 import org.gms.client.Character;
 import org.gms.client.*;
-import org.gms.client.inventory.Item;
-import org.gms.client.inventory.ItemFactory;
-import org.gms.client.inventory.Pet;
+import org.gms.client.inventory.*;
+import org.gms.client.inventory.manipulator.InventoryManipulator;
 import org.gms.client.keybind.KeyBinding;
 import org.gms.config.GameConfig;
 import org.gms.constants.game.GameConstants;
@@ -1501,5 +1500,34 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
     public void resetMobVacPosition() {
         MobVacHandler.resetPosition(getPlayer());
+    }
+
+    public Equip getInventoryEquip(int slot) {
+        var item = getPlayer().getInventory(InventoryType.EQUIP).getItem((byte) slot);
+        if (item == null) {
+            return null;
+        }
+        return (Equip) item;
+    }
+
+    public boolean addUpgradeSlot(int equipPosition, int maxUpgradeSlots) {
+        var player = getPlayer();
+        var item = player.getInventory(InventoryType.EQUIP).getItem((short) 1);
+        if (item == null) {
+            player.message("请把需要开槽的装备放到装备栏第一格");
+            return false;
+        }
+
+        var equip = (Equip) item;
+        if (equip.getLevel() + equip.getUpgradeSlots() >= maxUpgradeSlots) {
+            player.message("装备可砸卷次数不能超过 " + maxUpgradeSlots);
+            return false;
+        }
+
+        var newEquip =(Equip) equip.copy();
+        newEquip.setUpgradeSlots(equip.getUpgradeSlots() + 1);
+        InventoryManipulator.removeFromSlot(c, InventoryType.EQUIP, (short) equipPosition, equip.getQuantity(), false, false);
+        gainEquip(newEquip);
+        return true;
     }
 }

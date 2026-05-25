@@ -1120,24 +1120,27 @@ public class ItemInformationProvider {
                         case ItemId.CHAOS_SCROll_60:
                         case ItemId.LIAR_TREE_SAP:
                         case ItemId.MAPLE_SYRUP:
-                            scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
-
-                            // #混沌卷轴不扣减升级槽#
-                            if (scrollId == ItemId.CHAOS_SCROll_60) {
-                                nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
-
-                                // #自定义星级#
-                                if (StringUtils.isBlank(nEquip.getOwner())) {
-                                    nEquip.setOwner("[1]星");
-                                } else {
-                                    String owner = nEquip.getOwner();
-                                    try {
-                                        int star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
-                                        nEquip.setOwner("[" + (star + 1) + "]星");
-                                    } catch (Exception e) {
-                                        log.error("更新星级失败: {}", owner);
-                                    }
+                            // #自定义星级#
+                            int star = -1;
+                            if (StringUtils.isBlank(nEquip.getOwner())) {
+                                star = 0;
+                            } else {
+                                String owner = nEquip.getOwner();
+                                try {
+                                    star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
+                                } catch (Exception e) {
+                                    log.error("获取星级失败: {}", owner);
+                                    star = 0;
                                 }
+                            }
+
+                            if (star < 100) {
+                                scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
+
+                                // #混沌卷轴不扣减升级槽#
+                                nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
+                                // 提升星级
+                                nEquip.setOwner("[" + (star + 1) + "]星");
                             }
                             break;
                         default:

@@ -92,6 +92,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
     private boolean itemScript;
     private List<PartyCharacter> otherParty;
     private static final GachaponService gachaponService = ServerManager.getApplicationContext().getBean(GachaponService.class);
+    private final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
     private final Map<Integer, String> npcDefaultTalks = new HashMap<>();
     @Getter
@@ -1529,5 +1530,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         InventoryManipulator.removeFromSlot(c, InventoryType.EQUIP, (short) equipPosition, equip.getQuantity(), false, false);
         gainEquip(newEquip);
         return true;
+    }
+
+    public void sellAllEquipsFromPosition(int position) {
+        getPlayer().sellAllItemsFromPosition(ii,InventoryType.EQUIP, (short)position);
     }
 }

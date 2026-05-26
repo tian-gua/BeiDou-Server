@@ -22,7 +22,7 @@ function action(mode, type, selection) {
         cm.sendSimple(text);
     } else if (status === 1) {
         if (selection === 0) {
-            cm.sendOk("下次再考虑");
+            cm.sendOk("考虑好了再来找我！");
             cm.dispose();
         } else if (selection === 1) {
             if (cm.itemQuantity(4310000) >= 10) {

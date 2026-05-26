@@ -52,7 +52,7 @@ function action(mode, type, selection) {
         // text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
         text += "#L3#传送自由#l \t #L71#超级传送#l \t #L1005#快捷商店#l\r\n";
         text += "#L2#在线奖励#l \t #L0#新人福利#l \t #L1#每日签到#l\r\n";
-        text += "#L4#爆率一览#l \t #L1006#装备开槽#l\r\n"
+        text += "#L1007#快速卖装#l \t #L4#爆率一览#l \t #L1006#装备开槽#l\r\n"
         text += "\r\n"
         text += "#L1001#满技能#l \t #L1004#清空技能点#l\r\n"
         text += "#L1003#偷学稳如泰山#l \t #L1002#偷学二段跳#l\r\n"
@@ -172,6 +172,9 @@ function doSelect(selection) {
             break;
         case 1006:
             openNpc("装备开槽");
+            break;
+        case 1007:
+            openNpc("快速卖装");
             break;
         default:
             cm.sendOk("该功能暂不支持，敬请期待！");

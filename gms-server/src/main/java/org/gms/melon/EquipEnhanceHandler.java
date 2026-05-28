@@ -7,7 +7,7 @@ import org.gms.server.ItemInformationProvider;
 
 public class EquipEnhanceHandler {
 
-    public static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
+    private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
     public static void addUpgradeSlot(Character player) {
         // 获取装备背包第一格的装备

@@ -2,10 +2,12 @@ package org.gms.melon;
 
 import org.gms.client.Character;
 import org.gms.client.SkillFactory;
+import org.gms.client.inventory.InventoryType;
 import org.gms.client.status.MonsterStatus;
 import org.gms.client.status.MonsterStatusEffect;
 import org.gms.constants.skills.ILWizard;
 
+import org.gms.server.ItemInformationProvider;
 import org.gms.server.StatEffect;
 import org.gms.server.life.Monster;
 import org.gms.server.maps.MapObject;
@@ -23,6 +25,8 @@ public class MobVacHandler {
 
     private static volatile Point vacPosition = null;
     private static volatile MapleMap vacMap = null;
+
+    private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
 
     public synchronized static void mobVac(boolean on, Character player) {
@@ -48,7 +52,7 @@ public class MobVacHandler {
         }
     }
 
-    public  synchronized static void resetPosition(Character player) {
+    public synchronized static void resetPosition(Character player) {
         if (!running) {
             player.dropMessage("吸怪未开启，无法重置位置。");
             return;
@@ -68,27 +72,30 @@ public class MobVacHandler {
         vacMap.setVacPoint(vacPosition);
         running = true; // 启动线程时设置标志位为 true
         t = new Thread(() -> {
+            int loopCount = 0;
+
             while (running) {
                 // 在这里实现线程的主要逻辑
                 var allPlayer = vacMap.getAllPlayer();
                 if (allPlayer.size() > 1) {
                     for (MapObject mo : allPlayer) {
                         if (mo.getObjectId() != player.getObjectId()) {
-                           var mapPlayer = (Character) mo;
-                           if (mapPlayer.getParty() == null || player.getParty() == null || mapPlayer.getParty().getId() != player.getParty().getId()) {
-                               running = false;
-                               vacMap.setVacPoint(null);
-                               vacPosition = null;
-                               player.dropMessage("吸怪已关闭。");
+                            var mapPlayer = (Character) mo;
+                            if (mapPlayer.getParty() == null || player.getParty() == null || mapPlayer.getParty()
+                                    .getId() != player.getParty().getId()) {
+                                running = false;
+                                vacMap.setVacPoint(null);
+                                vacPosition = null;
+                                player.dropMessage("吸怪已关闭。");
 
-                               // 清空怪物
-                               vacMap.resetMapObjects();
+                                // 清空怪物
+                                vacMap.resetMapObjects();
 
-                               break;
-                           }
+                                break;
+                            }
                         }
                     }
-                }  else {
+                } else {
                     if (allPlayer.isEmpty() || allPlayer.getFirst().getObjectId() != player.getObjectId()) {
                         running = false;
                         vacMap.setVacPoint(null);
@@ -106,6 +113,14 @@ public class MobVacHandler {
                     if (!monster.isBoss() && monster.isAlive()) {
                         applyBuff(player, monster);
                     }
+                }
+
+                loopCount++;
+                if (loopCount >= 100) {
+                    int mesoGain = player.sellAllItemsFromPosition(ii, InventoryType.EQUIP, (short) 25);
+                    player.message("通过【自动卖装备】获得 " + mesoGain / 10000 + "万 金币。");
+
+                    loopCount = 0;
                 }
 
                 try {
@@ -128,7 +143,7 @@ public class MobVacHandler {
                     Map.of(MonsterStatus.FREEZE, effect.getX()),
                     skill, null, false
             );
-            monster.applyStatus(player, mse, false, (long)effect.getDuration() * 100);
+            monster.applyStatus(player, mse, false, (long) effect.getDuration() * 100);
             monster.resetMobPosition(vacPosition);
         }
     }

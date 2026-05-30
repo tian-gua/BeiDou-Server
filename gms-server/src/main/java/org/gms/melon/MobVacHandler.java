@@ -116,10 +116,12 @@ public class MobVacHandler {
                 }
 
                 loopCount++;
-                if (loopCount >= 100) {
-                    int mesoGain = player.sellAllItemsFromPosition(ii, InventoryType.EQUIP, (short) 25);
-                    player.message("通过【自动卖装备】获得 " + mesoGain / 10000 + "万 金币。");
-
+                if (loopCount >= 60) {
+                    short numFreeSlot = player.getInventory(InventoryType.EQUIP).getNumFreeSlot();
+                    if (numFreeSlot < 8) {
+                        int mesoGain = player.sellAllItemsFromPosition(ii, InventoryType.EQUIP, (short) 25);
+                        player.message("通过【自动卖装备】获得 " + mesoGain / 10000 + "万 金币。");
+                    }
                     loopCount = 0;
                 }
 

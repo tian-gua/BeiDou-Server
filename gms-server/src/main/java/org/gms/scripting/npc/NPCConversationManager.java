@@ -34,6 +34,7 @@ import org.gms.constants.id.MapId;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.constants.string.LanguageConstants;
 import org.gms.manager.ServerManager;
+import org.gms.melon.EquipEnhanceHandler;
 import org.gms.melon.MobVacHandler;
 import org.gms.model.pojo.NextLevelContext;
 import org.gms.net.server.Server;
@@ -58,8 +59,6 @@ import org.gms.server.SkillbookInformationProvider.SkillBookEntry;
 import org.gms.server.events.gm.Event;
 import org.gms.server.expeditions.Expedition;
 import org.gms.server.expeditions.ExpeditionType;
-import org.gms.server.gachapon.Gachapon;
-import org.gms.server.gachapon.Gachapon.GachaponItem;
 import org.gms.server.life.LifeFactory;
 import org.gms.server.life.PlayerNPC;
 import org.gms.server.maps.MapManager;
@@ -1542,5 +1541,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
     public void sellAllEquipsFromPosition(int position) {
         getPlayer().sellAllItemsFromPosition(ii,InventoryType.EQUIP, (short)position);
+    }
+
+    public boolean enhanceEquip(boolean useMaple) {
+        return EquipEnhanceHandler.enhance(getPlayer(), useMaple);
     }
 }

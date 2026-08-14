@@ -21,7 +21,6 @@
  */
 package org.gms.server;
 
-import org.apache.commons.lang3.StringUtils;
 import org.gms.client.Character;
 import org.gms.client.Client;
 import org.gms.client.Job;
@@ -641,10 +640,8 @@ public class ItemInformationProvider {
     }
 
     private static short chscrollRandomizedStat(int range) {
-//        return (short) Randomizer.rand(-range, range);
-        return (short) Randomizer.rand(1, range);
+        return (short) Randomizer.rand(-range, range);
     }
-
 
     public void scrollOptionEquipWithChaos(Equip nEquip, int range, boolean option) {
         // option: watk, matk, wdef, mdef, spd, jump, hp, mp
@@ -914,7 +911,7 @@ public class ItemInformationProvider {
 
                 if (nEquip.getHp() > 0) {
                     if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                        temp = curHp + chscrollRandomizedStat(range * 10);
+                        temp = curHp + chscrollRandomizedStat(range);
                     } else {
                         temp = nEquip.getHp() + chscrollRandomizedStat(range);
                     }
@@ -924,7 +921,7 @@ public class ItemInformationProvider {
 
                 if (nEquip.getMp() > 0) {
                     if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                        temp = curMp + chscrollRandomizedStat(range * 10);
+                        temp = curMp + chscrollRandomizedStat(range);
                     } else {
                         temp = nEquip.getMp() + chscrollRandomizedStat(range);
                     }
@@ -1034,14 +1031,14 @@ public class ItemInformationProvider {
             }
             if (nEquip.getHp() > 0) {
                 if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                    nEquip.setHp(getMaximumShortMaxIfOverflow(nEquip.getHp(), (nEquip.getHp() + chscrollRandomizedStat(range * 10))));
+                    nEquip.setHp(getMaximumShortMaxIfOverflow(nEquip.getHp(), (nEquip.getHp() + chscrollRandomizedStat(range))));
                 } else {
                     nEquip.setHp(getMaximumShortMaxIfOverflow(0, (nEquip.getHp() + chscrollRandomizedStat(range))));
                 }
             }
             if (nEquip.getMp() > 0) {
                 if (GameConfig.getServerBoolean("use_enhanced_chaos_scroll")) {
-                    nEquip.setMp(getMaximumShortMaxIfOverflow(nEquip.getMp(), (nEquip.getMp() + chscrollRandomizedStat(range * 10))));
+                    nEquip.setMp(getMaximumShortMaxIfOverflow(nEquip.getMp(), (nEquip.getMp() + chscrollRandomizedStat(range))));
                 } else {
                     nEquip.setMp(getMaximumShortMaxIfOverflow(0, (nEquip.getMp() + chscrollRandomizedStat(range))));
                 }
@@ -1120,29 +1117,9 @@ public class ItemInformationProvider {
                         case ItemId.CHAOS_SCROll_60:
                         case ItemId.LIAR_TREE_SAP:
                         case ItemId.MAPLE_SYRUP:
-                            // #自定义星级#
-                            int star = -1;
-                            if (StringUtils.isBlank(nEquip.getOwner())) {
-                                star = 0;
-                            } else {
-                                String owner = nEquip.getOwner();
-                                try {
-                                    star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
-                                } catch (Exception e) {
-                                    log.error("获取星级失败: {}", owner);
-                                    star = 0;
-                                }
-                            }
-
-                            if (star < 100) {
-                                scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
-
-                                // #混沌卷轴不扣减升级槽#
-                                nEquip.setUpgradeSlots(nEquip.getUpgradeSlots() + 1);
-                                // 提升星级
-                                nEquip.setOwner("[" + (star + 1) + "]星");
-                            }
+                            scrollEquipWithChaos(nEquip, GameConfig.getServerInt("chaos_scroll_stat_range")); // 使用混沌卷轴增加随机属性
                             break;
+
                         default:
                             improveEquipStats(nEquip, stats); // 默认情况下提高装备属性
                             break;
@@ -1153,10 +1130,7 @@ public class ItemInformationProvider {
                         if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {   // 处理修饰卷轴不消耗插槽的问题
                             nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1)); // 减少一个升级插槽
                         }
-                        // 混沌卷轴不增加等级
-                        if (scrollId != ItemId.CHAOS_SCROll_60) {
-                            nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
-                        }
+                        nEquip.setLevel((byte) (nEquip.getLevel() + 1)); // 提升装备等级
                     }
                 } else {
                     // 卷轴使用失败的情况

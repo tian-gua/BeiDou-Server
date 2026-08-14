@@ -31,6 +31,7 @@ import org.gms.client.SkillFactory;
 import org.gms.client.status.MonsterStatus;
 import org.gms.client.status.MonsterStatusEffect;
 import org.gms.config.GameConfig;
+import org.gms.constants.id.MapId;
 import org.gms.constants.id.MobId;
 import org.gms.constants.skills.Crusader;
 import org.gms.constants.skills.FPMage;
@@ -63,6 +64,9 @@ import org.gms.server.maps.AbstractAnimatedMapObject;
 import org.gms.server.maps.MapObjectType;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Summon;
+import org.gms.server.partyquest.Pyramid;
+import org.gms.server.quest.medal.SpecialChallengeMedal;
+import org.gms.server.quest.medal.VeteranHunterMedal;
 
 import java.awt.*;
 import java.lang.ref.WeakReference;
@@ -414,34 +418,26 @@ public class Monster extends AbstractLoadedLife {
                 return false;
             }
 
-            /* pyramid not implemented
-            Pair<Integer, Integer> cool = this.getStats().getCool();
-            if (cool != null) {
-                Pyramid pq = (Pyramid) chr.getPartyQuest();
-                if (pq != null) {
-                    if (damage > 0) {
-                        if (damage >= cool.getLeft()) {
-                            if ((Math.random() * 100) < cool.getRight()) {
-                                pq.cool();
-                            } else {
-                                pq.kill();
-                            }
-                        } else {
-                            pq.kill();
-                        }
-                    } else {
-                        pq.miss();
-                    }
-                    killed = true;
-                }
+            Pyramid pyramid = null;
+            if (attacker.getPartyQuest() instanceof Pyramid && MapId.isNettsPyramid(attacker.getMapId())) {
+                pyramid = (Pyramid) attacker.getPartyQuest();
             }
-            */
 
             if (damage > 0) {
                 this.applyDamage(attacker, damage, stayAlive, false);
                 if (!this.isAlive()) {  // monster just died
                     lastHit = true;
+                    if (pyramid != null) {
+                        Pair<Integer, Integer> cool = this.getStats().getCool();
+                        if (cool != null && damage >= cool.getLeft() && Randomizer.nextInt(100) < cool.getRight()) {
+                            pyramid.cool();
+                        } else {
+                            pyramid.kill();
+                        }
+                    }
                 }
+            } else if (pyramid != null) {
+                pyramid.miss();
             }
         } finally {
             this.unlockMonster();
@@ -467,6 +463,12 @@ public class Monster extends AbstractLoadedLife {
 
         if (!fake) {
             dispatchMonsterDamaged(from, trueDamage);
+        }
+
+        // ========== 通知事件实例记录伤害 ==========
+        EventInstanceManager eim = getMap().getEventInstance();
+        if (eim != null && !fake) {
+            eim.addDamage(from, trueDamage);
         }
 
         if (!takenDamage.containsKey(from.getId())) {
@@ -765,6 +767,9 @@ public class Monster extends AbstractLoadedLife {
             attacker.gainExp(_personalExp, _partyExp, true, false, white);
             attacker.increaseEquipExp(_personalExp);
             attacker.raiseQuestMobCount(getId());
+            VeteranHunterMedal.onMonsterKilled(attacker, this);
+            // 特级挑战勋章复用怪物死亡事件，在角色已接任务时写入个人击杀进度。
+            SpecialChallengeMedal.onMonsterKilled(attacker, this);
         }
     }
 
@@ -1852,7 +1857,7 @@ public class Monster extends AbstractLoadedLife {
         Character newControllerWithPuppet = null;
 
         for (Character chr : getMap().getAllPlayers()) {
-            if (!chr.isHidden()) {
+            if (!chr.isHidden() && chr.isLoggedInWorld()) {   // 过滤已断线/awayFromWorld 的幽灵玩家，避免被选为 controller 候选
                 int ctrlMonsSize = chr.getNumControlledMonsters();
 
                 if (isCharacterPuppetInVicinity(chr)) {

@@ -3,8 +3,9 @@
 !.idea/codeStyles/
 *.iml
 /target
-.github
-!.github/ISSUE_TEMPLATE
+.github/*
+!.github/ISSUE_TEMPLATE/
+!.github/workflows/
 .vscode
 
 # build files
@@ -31,3 +32,5 @@ database/docker-pg-db-data
 # Java project specific
 main/resources/static/
 src/main/resources/static/
+.claude/settings.local.json
+CLAUDE.local.md

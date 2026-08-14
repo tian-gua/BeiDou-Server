@@ -35,6 +35,7 @@ import org.gms.constants.id.ItemId;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.net.AbstractPacketHandler;
 import org.gms.net.packet.InPacket;
+import org.gms.net.server.channel.Channel;
 import org.gms.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -265,11 +266,28 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler {
                         c.getWorldServer().registerPlayerShop(shop);
                         //c.sendPacket(PacketCreator.getPlayerShopRemoveVisitor(1));
                     } else if (ItemConstants.isHiredMerchant(itemId)) {
+                        if (chr.hasMerchant() || c.getWorldServer().getHiredMerchant(chr.getId()) != null) {
+                            chr.dropMessage(1, "You already have a store open.");
+                            log.warn("Character {} attempted to create a duplicate HiredMerchant on channel {}",
+                                    chr.getName(), c.getChannel());
+                            return;
+                        }
+
                         HiredMerchant merchant = new HiredMerchant(chr, desc, itemId);
-                        chr.setHiredMerchant(merchant);
-                        c.getWorldServer().registerHiredMerchant(merchant);
-                        chr.getClient().getChannelServer().addHiredMerchant(chr.getId(), merchant);
-                        chr.sendPacket(PacketCreator.getHiredMerchant(chr, merchant, true));
+                        Channel channelServer = chr.getClient().getChannelServer();
+                        boolean channelAdded = channelServer.addHiredMerchant(chr.getId(), merchant);
+                        boolean worldAdded = channelAdded && c.getWorldServer().registerHiredMerchant(merchant);
+                        if (channelAdded && worldAdded) {
+                            chr.setHiredMerchant(merchant);
+                            chr.sendPacket(PacketCreator.getHiredMerchant(chr, merchant, true));
+                        } else {
+                            if (channelAdded) {
+                                channelServer.removeHiredMerchant(chr.getId(), merchant);
+                            }
+                            chr.dropMessage(1, "You already have a store open.");
+                            log.warn("Character {} could not create HiredMerchant because a channel or world instance already exists",
+                                    chr.getName());
+                        }
                     }
                 }
             } else if (mode == Action.INVITE.getCode()) {
@@ -623,15 +641,28 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler {
                 PlayerShop shop = chr.getPlayerShop();
                 HiredMerchant merchant = chr.getHiredMerchant();
                 if (shop != null && shop.isOwner(chr)) {
-                    if (shop.isOpen() || !shop.addItem(shopItem)) { // thanks Vcoc for pointing an exploit with unlimited shop slots    //感谢Vcoc指出了一个具有无限商店插槽的漏洞
-                        c.sendPacket(PacketCreator.serverNotice(1, I18nUtil.getMessage("PlayerInteractionHandler.message11")));
-                        return;
-                    }
+                    Inventory inv = chr.getInventory(ivType);
+                    inv.lockInventory();
+                    try {
+                        Item checkItem = inv.getItem(slot);
+                        if (checkItem == null || checkItem.getItemId() != ivItem.getItemId() || checkItem.getQuantity() < (bundles * perBundle)) {
+                            c.sendPacket(PacketCreator.serverNotice(1, I18nUtil.getMessage("PlayerInteractionHandler.message7")));
+                            c.sendPacket(PacketCreator.enableActions());
+                            return;
+                        }
 
-                    if (ItemConstants.isRechargeable(ivItem.getItemId())) {
-                        InventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.getQuantity(), true);
-                    } else {
-                        InventoryManipulator.removeFromSlot(c, ivType, slot, (short) (bundles * perBundle), true);
+                        if (shop.isOpen() || !shop.addItem(shopItem)) { // thanks Vcoc for pointing an exploit with unlimited shop slots    //感谢Vcoc指出了一个具有无限商店插槽的漏洞
+                            c.sendPacket(PacketCreator.serverNotice(1, I18nUtil.getMessage("PlayerInteractionHandler.message11")));
+                            return;
+                        }
+
+                        if (ItemConstants.isRechargeable(ivItem.getItemId())) {
+                            InventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.getQuantity(), true);
+                        } else {
+                            InventoryManipulator.removeFromSlot(c, ivType, slot, (short) (bundles * perBundle), true);
+                        }
+                    } finally {
+                        inv.unlockInventory();
                     }
 
                     c.sendPacket(PacketCreator.getPlayerShopItemUpdate(shop));
@@ -641,15 +672,28 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler {
                         return;
                     }
 
-                    if (merchant.isOpen() || !merchant.addItem(shopItem)) { // thanks Vcoc for pointing an exploit with unlimited shop slots    //感谢Vcoc指出了一个具有无限商店插槽的漏洞
-                        c.sendPacket(PacketCreator.serverNotice(1, I18nUtil.getMessage("PlayerInteractionHandler.message11")));
-                        return;
-                    }
+                    Inventory inv = chr.getInventory(ivType);
+                    inv.lockInventory();
+                    try {
+                        Item checkItem = inv.getItem(slot);
+                        if (checkItem == null || checkItem.getItemId() != ivItem.getItemId() || checkItem.getQuantity() < (bundles * perBundle)) {
+                            c.sendPacket(PacketCreator.serverNotice(1, I18nUtil.getMessage("PlayerInteractionHandler.message7")));
+                            c.sendPacket(PacketCreator.enableActions());
+                            return;
+                        }
 
-                    if (ItemConstants.isRechargeable(ivItem.getItemId())) {
-                        InventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.getQuantity(), true);
-                    } else {
-                        InventoryManipulator.removeFromSlot(c, ivType, slot, (short) (bundles * perBundle), true);
+                        if (merchant.isOpen() || !merchant.addItem(shopItem)) { // thanks Vcoc for pointing an exploit with unlimited shop slots    //感谢Vcoc指出了一个具有无限商店插槽的漏洞
+                            c.sendPacket(PacketCreator.serverNotice(1, I18nUtil.getMessage("PlayerInteractionHandler.message11")));
+                            return;
+                        }
+
+                        if (ItemConstants.isRechargeable(ivItem.getItemId())) {
+                            InventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.getQuantity(), true);
+                        } else {
+                            InventoryManipulator.removeFromSlot(c, ivType, slot, (short) (bundles * perBundle), true);
+                        }
+                    } finally {
+                        inv.unlockInventory();
                     }
 
                     c.sendPacket(PacketCreator.updateHiredMerchant(merchant, chr));

@@ -49,7 +49,10 @@ function action(mode, type, selection) {
         text += "当前信用券：" + cm.getPlayer().getCashShop().getCash(4) + "\r\n";
         text += "当前金币：" + cm.getPlayer().getMeso() + "\r\n";
         text += " \r\n\r\n";
+
         // text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
+        // text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
+        // text += "#L0#新人福利#l \t #L1#每日签到#l  \t #L72#转世重生#l\r\n";
         text += "#L3#传送自由#l \t #L71#超级传送#l \t #L1005#快捷商店#l\r\n";
         text += "#L2#在线奖励#l \t #L0#新人福利#l \t #L1#每日签到#l\r\n";
         text += "#L1007#快速卖装#l \t #L4#爆率一览#l \t #L1006#装备开槽#l\r\n"
@@ -58,7 +61,7 @@ function action(mode, type, selection) {
         text += "#L1003#偷学稳如泰山#l \t #L1002#偷学二段跳#l\r\n"
         // text += "#L999#测试脚本>>>未上线#l \t \r\n";
         text += "\r\n"
-        if (cm.getClient().getAccountName() === "melon" || cm.getClient().getAccountName() === "qqqqqq") {
+        if (cm.getClient().getAccountName() === "melon") {
             text += "#L1100#开启吸怪#l \t #L1101#关闭吸怪#l \t #L1102#刷新位置#l\r\n";
         }
         if (cm.getPlayer().isGM()) {

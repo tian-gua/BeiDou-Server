@@ -54,10 +54,10 @@ function action(mode, type, selection) {
         // text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
         // text += "#L0#新人福利#l \t #L1#每日签到#l  \t #L72#转世重生#l\r\n";
         text += "#L3#传送自由#l \t #L71#超级传送#l \t #L1005#快捷商店#l\r\n";
-        text += "#L2#在线奖励#l \t #L0#新人福利#l \t #L1#每日签到#l\r\n";
-        text += "#L1007#快速卖装#l \t #L4#爆率一览#l \t #L1006#装备开槽#l\r\n"
+        text += "#L0#新人福利#l \t #L2#在线奖励#l \t #L1#每日签到#l\r\n";
+        text += "#L4#爆率一览#l \t #L1001#满技能#l \t #L1004#清空技能点#l\r\n"
+        text += "#L1007#快速卖装#l \t #L1006#装备开槽#l \t #L1008#装备升星#l\r\n"
         text += "\r\n"
-        text += "#L1001#满技能#l \t #L1004#清空技能点#l\r\n"
         text += "#L1003#偷学稳如泰山#l \t #L1002#偷学二段跳#l\r\n"
         // text += "#L999#测试脚本>>>未上线#l \t \r\n";
         text += "\r\n"
@@ -175,6 +175,9 @@ function doSelect(selection) {
             break;
         case 1006:
             openNpc("装备开槽");
+            break;
+        case 1008:
+            openNpc("装备升星");
             break;
         case 1007:
             openNpc("快速卖装");

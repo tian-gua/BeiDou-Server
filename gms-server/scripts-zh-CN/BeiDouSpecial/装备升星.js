@@ -26,8 +26,22 @@ function action(mode, type, selection) {
             cm.sendOk("考虑好了再来找我！");
             cm.dispose();
         } else if (selection === 1) {
+            if (cm.getMeso() >= 100000) {
+                var result = cm.enhanceEquip(false);
+                if (result) {
+                    cm.gainMeso(-100000);
+                    cm.dispose();
+                } else {
+                    cm.sendOk("升星失败，装备不符合升星条件");
+                    cm.dispose();
+                }
+            } else {
+                cm.sendOk("你没有10w金币");
+                cm.dispose();
+            }
+        } else if (selection === 2) {
             if (cm.getMeso() >= 100000 && cm.itemQuantity(4001126) >= 1) {
-                var result = cm.enhanceEquip();
+                var result = cm.enhanceEquip(true);
                 if (result) {
                     cm.gainMeso(-100000);
                     cm.gainItem(4001126, -1);
@@ -38,13 +52,6 @@ function action(mode, type, selection) {
                 }
             } else {
                 cm.sendOk("你没有10w金币或者#i4001126#");
-                cm.dispose();
-            }
-        } else if (selection === 2) {
-            if (cm.getMeso() >= 100000) {
-
-            } else {
-                cm.sendOk("你没有10w金币");
                 cm.dispose();
             }
         } else {

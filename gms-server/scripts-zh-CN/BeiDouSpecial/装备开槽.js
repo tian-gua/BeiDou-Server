@@ -16,7 +16,7 @@ function action(mode, type, selection) {
     // #装备开槽#
     if (status === 0) {
         var itemId = cm.getInventoryEquip(1).getItemId();
-        let text = "你要为 #r#i" + itemId + "##k开槽吗？\r\n 每个装备最多能开 30 个槽位，每次开槽费用为 1个 #i4310000#\r\n\r\n";
+        let text = "你要为 #r#i" + itemId + "##k开槽吗？\r\n 每个装备最多能开 15 个槽位，每次开槽费用为 1个 #i4310000#\r\n\r\n";
         text += "#L0#我再考虑考虑#l\r\n\r\n";
         text += "#L1#开！#l\r\n";
         cm.sendSimple(text);
@@ -26,7 +26,7 @@ function action(mode, type, selection) {
             cm.dispose();
         } else if (selection === 1) {
             if (cm.itemQuantity(4310000) >= 1) {
-                var result = cm.addUpgradeSlot(1, 30);
+                var result = cm.addUpgradeSlot(1, 15);
                 if (result) {
                     cm.gainItem(4310000, -1);
                     cm.sendOk("开槽完成！请检查你的背包");

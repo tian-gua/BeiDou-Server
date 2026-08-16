@@ -5,6 +5,7 @@ function start() {
     status = -1;
     action(1, 0, 0);
 }
+
 function action(mode, type, selection) {
     if (mode === 1) {
         status++;
@@ -18,7 +19,9 @@ function action(mode, type, selection) {
         var itemId = cm.getInventoryEquip(1).getItemId();
         let text = "你要将背包 25 格之后的装备全部卖掉吗？\r\n\r\n";
         text += "#L0#我再考虑考虑#l\r\n\r\n";
-        text += "#L1#卖！#l\r\n";
+        text += "#L1#卖(保留24)！#l\r\n";
+        text += "#L2#卖(保留48)！#l\r\n";
+        text += "#L3#卖(保留72)！#l\r\n";
         cm.sendSimple(text);
     } else if (status === 1) {
         if (selection === 0) {
@@ -26,6 +29,14 @@ function action(mode, type, selection) {
             cm.dispose();
         } else if (selection === 1) {
             cm.sellAllEquipsFromPosition(25);
+            cm.sendOk("卖完了！");
+            cm.dispose();
+        } else if (selection === 2) {
+            cm.sellAllEquipsFromPosition(49);
+            cm.sendOk("卖完了！");
+            cm.dispose();
+        } else if (selection === 3) {
+            cm.sellAllEquipsFromPosition(73);
             cm.sendOk("卖完了！");
             cm.dispose();
         } else {

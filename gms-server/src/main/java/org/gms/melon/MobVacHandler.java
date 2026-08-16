@@ -41,15 +41,45 @@ public class MobVacHandler {
         }
 
         if (on && !running) {
-            start(player);
+            // start(player);
             player.dropMessage("吸怪已开启。");
             return;
         }
 
         if (!on && running) {
-            stop(); // 调用 stop 方法停止线程
+            // stop(); // 调用 stop 方法停止线程
             player.dropMessage("吸怪已关闭。");
         }
+    }
+
+    public synchronized static void setSpawnPoint(Character player) {
+        // clear last spawn point first
+        if (vacMap != null) {
+            vacMap.setVacPoint(null);
+        }
+
+        vacPosition = player.getPosition();
+        vacMap = player.getMap();
+        vacMap.setVacPoint(vacPosition);
+
+        // 移动所有怪物到新的刷怪点
+        for (Monster monster : vacMap.getAllMonsters()) {
+            if (!monster.isBoss() && monster.isAlive()) {
+                monster.resetMobPosition(vacPosition);
+            }
+        }
+
+        player.dropMessage("刷怪点已设置为当前位置。");
+    }
+
+    public synchronized static void clearSpawnPoint(Character player) {
+        vacPosition = null;
+        if (vacMap != null) {
+            vacMap.setVacPoint(null);
+            vacMap = null;
+        }
+
+        player.dropMessage("刷怪点已清除。");
     }
 
     public synchronized static void resetPosition(Character player) {

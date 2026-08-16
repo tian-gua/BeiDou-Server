@@ -19,6 +19,7 @@ function action(mode, type, selection) {
         let text = "你要为 #r#i" + itemId + "##k升星吗？\r\n 每个装备最多能升 30 个星级，每次升星费用为 10w 金币\r\n\r\n";
         text += "#L0#我再考虑考虑#l\r\n\r\n";
         text += "#L1#普通升星#l\r\n";
+        text += "#L3#快速5星#l\r\n";
         text += "#L2#枫叶升星（#i4001126#）#l\r\n";
         cm.sendSimple(text);
     } else if (status === 1) {
@@ -52,6 +53,20 @@ function action(mode, type, selection) {
                 }
             } else {
                 cm.sendOk("你没有10w金币或者#i4001126#");
+                cm.dispose();
+            }
+        } else if (selection === 3) {
+            if (cm.getMeso() >= 5000000) {
+                var times = cm.quickEnhance(5)
+                if (times > 0) {
+                    cm.gainMeso(-100000 * times);
+                    cm.dispose();
+                } else {
+                    cm.sendOk("升星失败，装备不符合升星条件");
+                    cm.dispose();
+                }
+            } else {
+                cm.sendOk("背包超过500万金币才能快速升星");
                 cm.dispose();
             }
         } else {

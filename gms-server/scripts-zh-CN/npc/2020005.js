@@ -46,11 +46,11 @@ function start() {
 }
 
 function action(mode, type, selection) {
-    if (!cm.isQuestCompleted(3035)) {
-        cm.sendNext("如果你决定帮助我，那么作为回报，我会让这件物品可以出售。");
-        cm.dispose();
-        return;
-    }
+    // if (!cm.isQuestCompleted(3035)) {
+    //     cm.sendNext("如果你决定帮助我，那么作为回报，我会让这件物品可以出售。");
+    //     cm.dispose();
+    //     return;
+    // }
     if (mode == 0 && status == 2) {
         cm.sendNext("我明白了。知道我这里有很多不同的物品。随便看看吧。我只卖这些物品给你，所以不会以任何方式欺骗你。");
         cm.dispose();

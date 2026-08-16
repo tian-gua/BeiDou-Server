@@ -1491,6 +1491,8 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 //            Skill skill = SkillFactory.getSkill(21001001);
 //            player.changeSkillLevel(skill, (byte) -1, -1, -1);
 //        }
+
+        clearSP();
         player.yellowMessage(I18nUtil.getMessage("MaxSkillCommand.message2"));
     }
 
@@ -1504,6 +1506,14 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
     public void mobVac(boolean on) {
         MobVacHandler.mobVac(on, getPlayer());
+    }
+
+    public void fixedSpawn(boolean on) {
+        if (on) {
+            MobVacHandler.setSpawnPoint(getPlayer());
+        } else {
+            MobVacHandler.clearSpawnPoint(getPlayer());
+        }
     }
 
     public void resetMobVacPosition() {
@@ -1545,5 +1555,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
     public boolean enhanceEquip(int maxStar, boolean useMaple) {
         return EquipEnhanceHandler.enhance(getPlayer(), maxStar, useMaple);
+    }
+
+    public int quickEnhance(int targetStar) {
+        return EquipEnhanceHandler.quickEnhance(getPlayer(), targetStar, false);
     }
 }

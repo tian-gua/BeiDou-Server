@@ -27,19 +27,7 @@ public class EquipEnhanceHandler {
         var equipName = ii.getName(equip.getItemId());
         player.message("开始升星装备 " + equipName + "...");
 
-        String owner = equip.getOwner();
-
-        int star = -1;
-        if (StringUtils.isBlank(owner)) {
-            star = 0;
-        } else {
-            try {
-                star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
-            } catch (Exception e) {
-                log.error("获取星级失败: {}", owner);
-                star = 0;
-            }
-        }
+        int star = getStar(equip);
 
         if (star >= maxStar) {
             player.message(String.format("装备 %s 已经达到最大星级 %d 星，无法继续升星", equipName, maxStar));
@@ -172,5 +160,50 @@ public class EquipEnhanceHandler {
             }
         }
         return true;
+    }
+
+    public static int quickEnhance(Character player, int targetStar, boolean useMaple) {
+        // loop enhance until reach target star
+        int times = 0;
+        while (true) {
+            var item = player.getInventory(InventoryType.EQUIP).getItem((short) 1);
+            if (item == null) {
+                player.message("请把需要升星的装备放到装备栏第一格");
+                break;
+            }
+
+            var equip = (Equip) item;
+            int star = getStar(equip);
+            if (star >= targetStar) {
+                player.message("装备 " + ii.getName(equip.getItemId()) + " 已经达到目标星级 " + targetStar + " 星，停止升星");
+                break;
+            }
+
+            boolean success = enhance(player, targetStar, useMaple);
+            if (!success) {
+                break;
+            }
+
+            times++;
+        }
+
+        player.message("共尝试升星 " + times + " 次");
+        return times;
+    }
+
+    private static int getStar(Equip equip) {
+        var owner = equip.getOwner();
+        int star = -1;
+        if (StringUtils.isBlank(owner)) {
+            star = 0;
+        } else {
+            try {
+                star = Integer.parseInt(owner.replace("[", "").replace("]星", ""));
+            } catch (Exception e) {
+                log.error("获取星级失败: {}", owner);
+                star = 0;
+            }
+        }
+        return star;
     }
 }

@@ -2046,6 +2046,16 @@ public class Character extends AbstractCharacterObject {
                 Item mItem = mapitem.getItem();
                 boolean hasSpaceInventory = true;
                 ItemInformationProvider ii = ItemInformationProvider.getInstance();
+
+                // #拾取特殊道具# 如枫叶和绝对音感，拾取后显示当前数量
+                if (4001126 == mapitem.getItemId() || 4310000 == mapitem.getItemId()) {
+                    if (4001126 == mapitem.getItemId()) {
+                        showHint(String.format("枫叶: %d，绝对音感: %d", this.countItem(4001126) + 1, this.countItem(4310000)), 300);
+                    } else {
+                        showHint(String.format("枫叶: %d，绝对音感: %d", this.countItem(4001126), this.countItem(4310000)+ 1) , 300);
+                    }
+                }
+
                 if (ItemId.isNxCard(mapitem.getItemId()) || mapitem.getMeso() > 0 || ii.isConsumeOnPickup(mapitem.getItemId()) || (hasSpaceInventory = InventoryManipulator.checkSpace(client, mapitem.getItemId(), mItem.getQuantity(), mItem.getOwner()))) {
                     int mapId = this.getMapId();
 
@@ -2075,7 +2085,7 @@ public class Character extends AbstractCharacterObject {
                                 }
 
                                 this.getMap().pickItemDrop(pickupPacket, mapitem);
-                            } else if (InventoryManipulator.addFromDrop(client, mItem, true)) {
+                            }  else if (InventoryManipulator.addFromDrop(client, mItem, true)) {
                                 this.getMap().pickItemDrop(pickupPacket, mapitem);
                             } else {
                                 enableActions();

@@ -1543,7 +1543,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         getPlayer().sellAllItemsFromPosition(ii,InventoryType.EQUIP, (short)position);
     }
 
-    public boolean enhanceEquip(boolean useMaple) {
-        return EquipEnhanceHandler.enhance(getPlayer(), useMaple);
+    public boolean enhanceEquip(int maxStar, boolean useMaple) {
+        return EquipEnhanceHandler.enhance(getPlayer(), maxStar, useMaple);
     }
 }

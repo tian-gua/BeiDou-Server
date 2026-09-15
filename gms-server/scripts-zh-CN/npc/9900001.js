@@ -50,13 +50,11 @@ function action(mode, type, selection) {
         text += "当前金币：" + cm.getPlayer().getMeso() + "\r\n";
         text += " \r\n\r\n";
 
-        // text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
-        // text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
-        // text += "#L0#新人福利#l \t #L1#每日签到#l  \t #L72#转世重生#l\r\n";
         text += "#L3#传送自由#l \t #L71#超级传送#l \t #L1005#快捷商店#l\r\n";
-        text += "#L0#新人福利#l \t #L2#在线奖励#l \t #L1#每日签到#l\r\n";
+        // text += "#L0#新人福利#l \t #L2#在线奖励#l \t #L1#每日签到#l\r\n";
         text += "#L4#爆率一览#l \t #L1001#技能全满#l \t #L69#快速转职#l\r\n"
         text += "#L1007#快速卖装#l \t #L1006#装备开槽#l \t #L1008#装备升星#l\r\n"
+        text += "#L5#野外BOSS刷新#l\r\n";
         text += "\r\n"
         text += "#L1003#偷学稳如泰山#l \t #L1002#偷学二段跳#l\r\n"
         // text += "#L999#测试脚本>>>未上线#l \t \r\n";
@@ -65,6 +63,13 @@ function action(mode, type, selection) {
             // text += "#L1100#开启吸怪#l \t #L1101#关闭吸怪#l \t #L1102#刷新位置#l\r\n";
             text += "#L1103#定点生怪#l \t #L1104#正常生怪#l\r\n";
         }
+
+		// text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
+		// text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
+        // text += "#L0#新人福利#l \t #L1#每日签到#l  \t #L72#转世重生#l\r\n";
+		// text += "#L5#野外BOSS刷新#l\r\n";
+		// text += "#L999#测试脚本>>>未上线#l \t \r\n";
+
         if (cm.getPlayer().isGM()) {
             text += "\r\n\r\n";
             text += "\t\t\t\t#r=====以下内容仅GM可见=====\r\n";
@@ -114,6 +119,9 @@ function doSelect(selection) {
             break;
         case 4:
             openNpc("当前地图掉落");
+            break;
+        case 5:
+            openNpc("AreaBossRefresh");
             break;
         // GM功能
         case 61:

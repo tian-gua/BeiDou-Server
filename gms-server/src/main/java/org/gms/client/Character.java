@@ -104,6 +104,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -2448,7 +2449,7 @@ public class Character extends AbstractCharacterObject {
         try {
             Server.getInstance().disbandGuild(guildId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(I18nUtil.getLogMessage("Character.disbandGuild.error1"), id, name, guildId, e);
         }
     }
 
@@ -3126,6 +3127,55 @@ public class Character extends AbstractCharacterObject {
         }
     }
 
+    /**
+     * 将金币扣除与调用方的数据库事务绑定。
+     * 角色保存与其他金币变更在事务完成前都会等待，
+     * 只有持久化成功后才发布新的内存余额。
+     *
+     * @param cost        需要扣除的正整数金币
+     * @param persistence 接收扣费后余额，并在同一事务中持久化业务与金币
+     * @return 事务和内存扣费是否均成功
+     */
+    public synchronized boolean spendMesoTransactionally(int cost, IntPredicate persistence) {
+        if (cost <= 0) {
+            return false;
+        }
+
+        int balanceAfter;
+        petLock.lock();
+        try {
+            int currentBalance = meso.get();
+            if (currentBalance < cost) {
+                return false;
+            }
+
+            balanceAfter = currentBalance - cost;
+            boolean persisted;
+            try {
+                persisted = persistence.test(balanceAfter);
+            } catch (RuntimeException e) {
+                log.error(I18nUtil.getLogMessage("Character.spendMesoTransactionally.error1"),
+                        id, cost, e);
+                return false;
+            }
+            if (!persisted) {
+                return false;
+            }
+            meso.set(balanceAfter);
+        } finally {
+            petLock.unlock();
+        }
+
+        try {
+            updateSingleStat(Stat.MESO, balanceAfter, false);
+            sendPacket(PacketCreator.getShowMesoGain(-cost, true));
+        } catch (RuntimeException e) {
+            log.error(I18nUtil.getLogMessage("Character.spendMesoTransactionally.error2"),
+                    id, cost, e);
+        }
+        return true;
+    }
+
     public void genericGuildMessage(int code) {
         this.sendPacket(GuildPackets.genericGuildMessage((byte) code));
     }
@@ -3422,6 +3472,8 @@ public class Character extends AbstractCharacterObject {
 
     public void cancelAllBuffs(boolean softcancel) {
         if (softcancel) {
+            // cancelEffectFromBuffStat 会重入 cancelEffect，外层也须按 prtLock -> effLock -> chrLock 取锁。
+            prtLock.lock();
             effLock.lock();
             chrLock.lock();
             try {
@@ -3437,6 +3489,7 @@ public class Character extends AbstractCharacterObject {
             } finally {
                 chrLock.unlock();
                 effLock.unlock();
+                prtLock.unlock();
             }
         } else {
             Map<StatEffect, Long> mseBuffs = new LinkedHashMap<>();
@@ -3616,31 +3669,38 @@ public class Character extends AbstractCharacterObject {
     }
 
     public void updateActiveEffects() {
-        effLock.lock();     // thanks davidlafriniere, maple006, RedHat for pointing a deadlock occurring here
+        // isUpdatingEffect -> StatEffect.isActive 会读取同图队友，必须与 cancelEffect、
+        // updateLocalStats 保持 prtLock -> effLock 顺序，避免切图与技能处理互相等待。
+        prtLock.lock();
         try {
-            Set<BuffStat> updatedBuffs = new LinkedHashSet<>();
-            Set<StatEffect> activeEffects = new LinkedHashSet<>();
+            effLock.lock();
+            try {
+                Set<BuffStat> updatedBuffs = new LinkedHashSet<>();
+                Set<StatEffect> activeEffects = new LinkedHashSet<>();
 
-            for (BuffStatValueHolder mse : effects.values()) {
-                activeEffects.add(mse.effect);
-            }
+                for (BuffStatValueHolder mse : effects.values()) {
+                    activeEffects.add(mse.effect);
+                }
 
-            for (Map<BuffStat, BuffStatValueHolder> buff : buffEffects.values()) {
-                StatEffect mse = getEffectFromBuffSource(buff);
-                if (isUpdatingEffect(activeEffects, mse)) {
-                    for (Pair<BuffStat, Integer> p : mse.getStatups()) {
-                        updatedBuffs.add(p.getLeft());
+                for (Map<BuffStat, BuffStatValueHolder> buff : buffEffects.values()) {
+                    StatEffect mse = getEffectFromBuffSource(buff);
+                    if (isUpdatingEffect(activeEffects, mse)) {
+                        for (Pair<BuffStat, Integer> p : mse.getStatups()) {
+                            updatedBuffs.add(p.getLeft());
+                        }
                     }
                 }
-            }
 
-            for (BuffStat mbs : updatedBuffs) {
-                effects.remove(mbs);
-            }
+                for (BuffStat mbs : updatedBuffs) {
+                    effects.remove(mbs);
+                }
 
-            updateEffects(updatedBuffs);
+                updateEffects(updatedBuffs);
+            } finally {
+                effLock.unlock();
+            }
         } finally {
-            effLock.unlock();
+            prtLock.unlock();
         }
     }
 
@@ -3727,6 +3787,8 @@ public class Character extends AbstractCharacterObject {
     }
 
     public void cancelBuffStats(BuffStat stat) {
+        // dropBuffStats 选择备用效果时会读取同图队友，与 cancelEffect 保持相同取锁顺序。
+        prtLock.lock();
         effLock.lock();
         try {
             List<Pair<Integer, BuffStatValueHolder>> cancelList = new LinkedList<>();
@@ -3751,6 +3813,7 @@ public class Character extends AbstractCharacterObject {
             }
         } finally {
             effLock.unlock();
+            prtLock.unlock();
         }
 
         cancelPlayerBuffs(Collections.singletonList(stat));
@@ -5208,6 +5271,12 @@ public class Character extends AbstractCharacterObject {
             return;
         }
 
+        if (merchant.isClosedForBan()) {
+            merchant.closeForBan();
+            this.setHiredMerchant(null);
+            return;
+        }
+
         if (merchant.isOwner(this) && !merchant.isPublished()) {
             merchant.closeOwnerMerchant(this);
             return;
@@ -5222,7 +5291,10 @@ public class Character extends AbstractCharacterObject {
             }
         } else {
             if (merchant.isOwner(this)) {
-                merchant.setOpen(true);
+                if (!merchant.setOpen(true)) {
+                    merchant.closeForBan();
+                    return;
+                }
             } else {
                 merchant.removeVisitor(this);
             }
@@ -7894,7 +7966,7 @@ public class Character extends AbstractCharacterObject {
                             rs.next();
                             for (int mob : qs.getProgress().keySet()) {
                                 psProgress.setInt(1, id);
-                                psProgress.setInt(2, rs.getInt(1));
+                                psProgress.setLong(2, rs.getLong(1));
                                 psProgress.setInt(3, mob);
                                 psProgress.setString(4, qs.getProgress(mob));
                                 psProgress.addBatch();
@@ -7903,7 +7975,7 @@ public class Character extends AbstractCharacterObject {
 
                             for (int i = 0; i < qs.getMedalMaps().size(); i++) {
                                 psMedal.setInt(1, id);
-                                psMedal.setInt(2, rs.getInt(1));
+                                psMedal.setLong(2, rs.getLong(1));
                                 psMedal.setInt(3, qs.getMedalMaps().get(i));
                                 psMedal.addBatch();
                             }

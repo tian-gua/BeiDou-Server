@@ -34,8 +34,10 @@ public class EquipEnhanceHandler {
             return false;
         }
 
+        int rand = Randomizer.nextInt(100);
+        player.message(String.format("升星幸运值：%d", rand));
+        boolean success = rand >= 70;
         // 二分之一的概率成功
-        boolean success = Randomizer.nextBoolean();
         if (success) {
             short curStr, curDex, curInt, curLuk, curWatk, curWdef, curMatk, curMdef, curAcc, curAvoid, curSpeed, curJump, curHp, curMp;
             curStr = equip.getStr();
@@ -53,59 +55,59 @@ public class EquipEnhanceHandler {
             curHp = equip.getHp();
             curMp = equip.getMp();
 
-            double ratio = 0.1;
+            double ratio = 0.3;
 
             // random [0-100)，小于 70，ratio = 0.1，大于 70，ratio = 0.2，大于 90，ratio = 0.3
-            int rand = Randomizer.nextInt(100);
-            if (rand < 70) {
-                ratio = 0.1;
-                player.message("属性提升幅度为 10%");
-            } else if (rand < 90) {
-                ratio = 0.2;
-                player.message("属性提升幅度为 20%");
-            } else {
-                ratio = 0.3;
-                player.message("属性提升幅度为 30%");
-            }
-
-            log.info("升星成功，随机数: {}, 属性提升幅度: {}", rand, ratio);
+//            int rand = Randomizer.nextInt(100);
+//            if (rand < 70) {
+//                ratio = 0.1;
+//                player.message("属性提升幅度为 10%");
+//            } else if (rand < 90) {
+//                ratio = 0.2;
+//                player.message("属性提升幅度为 20%");
+//            } else {
+//                ratio = 0.3;
+//                player.message("属性提升幅度为 30%");
+//            }
+//
+//            log.info("升星成功，随机数: {}, 属性提升幅度: {}", rand, ratio);
 
             // 已存在的属性 提升 ratio%，增加幅度最小为 1
             if (curStr > 0) {
-                equip.setStr((short) (curStr + Math.max(1, curStr * ratio)));
+                equip.setStr((short) (curStr + Math.max(3, curStr * ratio)));
             }
             if (curDex > 0) {
-                equip.setDex((short) (curDex + Math.max(1, curDex * ratio)));
+                equip.setDex((short) (curDex + Math.max(3, curDex * ratio)));
             }
             if (curInt > 0) {
-                equip.setInt((short) (curInt + Math.max(1, curInt * ratio)));
+                equip.setInt((short) (curInt + Math.max(3, curInt * ratio)));
             }
             if (curLuk > 0) {
-                equip.setLuk((short) (curLuk + Math.max(1, curLuk * ratio)));
+                equip.setLuk((short) (curLuk + Math.max(3, curLuk * ratio)));
             }
             if (curWatk > 0) {
-                equip.setWatk((short) (curWatk + Math.max(1, curWatk * ratio)));
+                equip.setWatk((short) (curWatk + Math.max(3, curWatk * ratio)));
             }
             if (curWdef > 0) {
-                equip.setWdef((short) (curWdef + Math.max(1, curWdef * ratio)));
+                equip.setWdef((short) (curWdef + Math.max(3, curWdef * ratio)));
             }
             if (curMatk > 0) {
-                equip.setMatk((short) (curMatk + Math.max(1, curMatk * ratio)));
+                equip.setMatk((short) (curMatk + Math.max(3, curMatk * ratio)));
             }
             if (curMdef > 0) {
-                equip.setMdef((short) (curMdef + Math.max(1, curMdef * ratio)));
+                equip.setMdef((short) (curMdef + Math.max(3, curMdef * ratio)));
             }
             if (curAcc > 0) {
-                equip.setAcc((short) (curAcc + Math.max(1, curAcc * ratio)));
+                equip.setAcc((short) (curAcc + Math.max(3, curAcc * ratio)));
             }
             if (curAvoid > 0) {
-                equip.setAvoid((short) (curAvoid + Math.max(1, curAvoid * ratio)));
+                equip.setAvoid((short) (curAvoid + Math.max(3, curAvoid * ratio)));
             }
             if (curSpeed > 0) {
-                equip.setSpeed((short) (curSpeed + Math.max(1, curSpeed * ratio)));
+                equip.setSpeed((short) (curSpeed + Math.max(3, curSpeed * ratio)));
             }
             if (curJump > 0) {
-                equip.setJump((short) (curJump + Math.max(1, curJump * ratio)));
+                equip.setJump((short) (curJump + Math.max(3, curJump * ratio)));
             }
             // hp 和 mp 提升 10%，增加幅度最小为 50
             if (curHp > 0) {
@@ -140,23 +142,18 @@ public class EquipEnhanceHandler {
             InventoryManipulator.addFromDrop(player.getClient(), newEquip, false);
             player.message("升星成功，装备 " + equipName + " 星级提升至 " + (star + 1) + " 星");
         } else {
-            // 如果是 5星以上的装备，升星失败会掉销毁装备
-            if (star >= 5) {
-                if (useMaple) {
-                    player.message("装备 " + equipName + " 升星失败，已被枫叶保护");
-                } else {
-                    player.message("装备 " + equipName + " 升星失败，已被销毁");
-                    InventoryManipulator.removeFromSlot(
-                            player.getClient(),
-                            InventoryType.EQUIP,
-                            (short) 1,
-                            equip.getQuantity(),
-                            false,
-                            false
-                    );
-                }
+            if (useMaple) {
+                player.message("装备 " + equipName + " 升星失败，已被枫叶保护");
             } else {
-                player.message("装备 " + equipName + " 升星失败，星级不变");
+                player.message("装备 " + equipName + " 升星失败，已被销毁");
+                InventoryManipulator.removeFromSlot(
+                        player.getClient(),
+                        InventoryType.EQUIP,
+                        (short) 1,
+                        equip.getQuantity(),
+                        false,
+                        false
+                );
             }
         }
         return true;

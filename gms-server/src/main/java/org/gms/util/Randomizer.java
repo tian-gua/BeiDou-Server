@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Randomizer {
 
-    private final static Random rand = new Random();
+    private final static Random rand = new Random(System.currentTimeMillis());
 
     public static int nextInt() {
         return rand.nextInt();

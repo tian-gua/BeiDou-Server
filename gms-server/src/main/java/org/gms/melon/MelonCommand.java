@@ -32,21 +32,15 @@ public class MelonCommand {
             }
 
             for (Integer monsterId : monsterIds) {
-                StringBuilder dropInfo = new StringBuilder();
                 String monsterName = monsterInformationProvider.getMobNameFromId(monsterId);
                 List<MonsterDropEntry> monsterDropEntries = monsterInformationProvider.retrieveDrop(monsterId);
                 if (monsterDropEntries.isEmpty()) {
                     continue;
                 }
-                dropInfo.append(String.format("%s 掉落: \n", monsterName));
+                player.message(String.format("%s 掉落: \n", monsterName));
                 for (MonsterDropEntry monsterDropEntry : monsterDropEntries) {
-                    dropInfo.append(String.format(
-                            "- %s (1/%d)\n",
-                            itemInformationProvider.getName(monsterDropEntry.itemId),
-                            monsterDropEntry.chance
-                    ));
+                    player.message(String.format("          - %s (%d)", itemInformationProvider.getName(monsterDropEntry.itemId), monsterDropEntry.chance));
                 }
-                player.message(dropInfo.toString());
             }
         }
     }

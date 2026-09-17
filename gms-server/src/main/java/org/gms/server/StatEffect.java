@@ -89,6 +89,7 @@ import org.gms.constants.skills.SuperGM;
 import org.gms.constants.skills.ThunderBreaker;
 import org.gms.constants.skills.WhiteKnight;
 import org.gms.constants.skills.WindArcher;
+import org.gms.melon.MelonConfig;
 import org.gms.net.packet.Packet;
 import org.gms.net.server.Server;
 import org.gms.net.server.world.Party;
@@ -1233,9 +1234,8 @@ public class StatEffect {
     }
 
     public int getBuffLocalDuration() {
-//        return !GameConfig.getServerBoolean("use_buff_everlasting") ? duration : Integer.MAX_VALUE;
-        // #3倍 Buff 时间#
-        return !GameConfig.getServerBoolean("use_buff_everlasting") ? Math.min(duration * 3, Integer.MAX_VALUE) : Integer.MAX_VALUE;
+        // return !GameConfig.getServerBoolean("use_buff_everlasting") ? duration : Integer.MAX_VALUE;
+        return !GameConfig.getServerBoolean("use_buff_everlasting") ? Math.min(duration * MelonConfig.MULTI_BUFF_TIME, Integer.MAX_VALUE) : Integer.MAX_VALUE;
     }
 
     public void silentApplyBuff(Character chr, long localStartTime) {

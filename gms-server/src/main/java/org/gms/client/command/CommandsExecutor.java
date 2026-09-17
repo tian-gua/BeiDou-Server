@@ -35,6 +35,7 @@ import org.gms.client.command.commands.gm6.*;
 import org.gms.config.GameConfig;
 import org.gms.constants.id.MapId;
 import org.gms.manager.ServerManager;
+import org.gms.melon.MelonCommand;
 import org.gms.service.CommandService;
 import org.gms.util.I18nUtil;
 import org.gms.util.Pair;
@@ -79,8 +80,8 @@ public class CommandsExecutor {
 //        registerLv4Commands();
 //        registerLv5Commands();
 //        registerLv6Commands();
-
         commandService.loadCommands(registeredCommands, commandsNameDesc);
+        registerMelonCommands();
     }
 
     public void handle(Client client, String message) {
@@ -408,4 +409,7 @@ public class CommandsExecutor {
         commandsNameDesc.add(levelCommandsCursor);
     }
 
+    private void registerMelonCommands() {
+        addCommand("mapdrop", 0, MelonCommand.MapDrop.class);
+    }
 }

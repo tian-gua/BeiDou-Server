@@ -183,8 +183,8 @@ public class MobVacHandler {
                     skill, null, false
             );
             monster.applyStatus(player, mse, false, (long) effect.getDuration() * 100);
-            monster.resetMobPosition(vacPosition);
         }
+        monster.resetMobPosition(vacPosition);
     }
 
     public synchronized static void stop() {

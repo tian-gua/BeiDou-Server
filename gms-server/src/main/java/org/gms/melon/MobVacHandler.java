@@ -28,6 +28,9 @@ public class MobVacHandler {
 
     private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
+    public synchronized static void mobVac(Character player) {
+        mobVac(!running, player);
+    }
 
     public synchronized static void mobVac(boolean on, Character player) {
         if (on && running) {

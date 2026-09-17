@@ -412,5 +412,6 @@ public class CommandsExecutor {
     private void registerMelonCommands() {
         levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
         addCommand("mapdrop", 0, MelonCommand.MapDrop.class);
+        addCommand("mobvac", 0, MelonCommand.MobVac.class);
     }
 }

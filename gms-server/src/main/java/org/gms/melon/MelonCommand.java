@@ -44,4 +44,15 @@ public class MelonCommand {
             }
         }
     }
+
+    public static class MobVac extends Command {
+        {
+            setDescription("吸怪");
+        }
+
+        @Override
+        public void execute(Client c, String[] params) {
+            MobVacHandler.mobVac(c.getPlayer());
+        }
+    }
 }

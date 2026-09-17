@@ -55,4 +55,15 @@ public class MelonCommand {
             MobVacHandler.mobVac(c.getPlayer());
         }
     }
+
+    public static class MobVacReset extends Command {
+        {
+            setDescription("吸怪点重置");
+        }
+
+        @Override
+        public void execute(Client c, String[] params) {
+            MobVacHandler.resetPosition(c.getPlayer());
+        }
+    }
 }

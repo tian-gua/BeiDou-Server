@@ -96,7 +96,7 @@ public class MobVacHandler {
         vacMap.setVacPoint(vacPosition);
 
         // 清空怪物
-        vacMap.resetMapObjects();
+        // vacMap.resetMapObjects();
 
         player.dropMessage("吸怪位置已重置。");
     }

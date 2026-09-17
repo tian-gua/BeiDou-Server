@@ -26,6 +26,8 @@ public class MobVacHandler {
     private static volatile Point vacPosition = null;
     private static volatile MapleMap vacMap = null;
 
+    private static final boolean AUTO_SALE = false;
+
     private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
     public synchronized static void mobVac(Character player) {
@@ -44,13 +46,13 @@ public class MobVacHandler {
         }
 
         if (on && !running) {
-            // start(player);
+            start(player);
             player.dropMessage("吸怪已开启。");
             return;
         }
 
         if (!on && running) {
-            // stop(); // 调用 stop 方法停止线程
+            stop();
             player.dropMessage("吸怪已关闭。");
         }
     }
@@ -128,18 +130,18 @@ public class MobVacHandler {
                             }
                         }
                     }
-                } else {
-                    if (allPlayer.isEmpty() || allPlayer.getFirst().getObjectId() != player.getObjectId()) {
-                        running = false;
-                        vacMap.setVacPoint(null);
-                        vacPosition = null;
-                        player.dropMessage("吸怪已关闭。");
+                } else if (allPlayer.isEmpty() || allPlayer.getFirst().getObjectId() != player.getObjectId()) {
 
-                        // 清空怪物
-                        vacMap.resetMapObjects();
+                    running = false;
+                    vacMap.setVacPoint(null);
+                    vacPosition = null;
+                    player.dropMessage("吸怪已关闭。");
 
-                        break; // 如果地图上没有玩家了，或者地图上有玩家但不是当前玩家，则停止线程
-                    }
+                    // 清空怪物
+                    vacMap.resetMapObjects();
+
+                    break; // 如果地图上没有玩家了，或者地图上有玩家但不是当前玩家，则停止线程
+
                 }
 
                 for (Monster monster : vacMap.getAllMonsters()) {
@@ -148,14 +150,16 @@ public class MobVacHandler {
                     }
                 }
 
-                loopCount++;
-                if (loopCount >= 60) {
-                    short numFreeSlot = player.getInventory(InventoryType.EQUIP).getNumFreeSlot();
-                    if (numFreeSlot < 8) {
-                        int mesoGain = player.sellAllItemsFromPosition(ii, InventoryType.EQUIP, (short) 25);
-                        player.message("通过【自动卖装备】获得 " + mesoGain / 10000 + "万 金币。");
+                if (AUTO_SALE) {
+                    loopCount++;
+                    if (loopCount >= 60) {
+                        short numFreeSlot = player.getInventory(InventoryType.EQUIP).getNumFreeSlot();
+                        if (numFreeSlot < 8) {
+                            int mesoGain = player.sellAllItemsFromPosition(ii, InventoryType.EQUIP, (short) 25);
+                            player.message("通过【自动卖装备】获得 " + mesoGain / 10000 + "万 金币。");
+                        }
+                        loopCount = 0;
                     }
-                    loopCount = 0;
                 }
 
                 try {

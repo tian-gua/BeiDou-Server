@@ -36,6 +36,7 @@ import org.gms.constants.game.GameConstants;
 import org.gms.constants.id.MapId;
 import org.gms.constants.id.MobId;
 import org.gms.constants.inventory.ItemConstants;
+import org.gms.melon.MobVacHandler;
 import org.gms.net.packet.Packet;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
@@ -697,7 +698,12 @@ public class MapleMap {
                     } else {
                         idrop = new Item(de.itemId, (short) 0, (short) ((de.Maximum != 1 && de.Maximum > de.Minimum)? Randomizer.nextInt(de.Maximum - de.Minimum) + de.Minimum : de.Maximum));
                     }
-                    spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questid);
+                    // #吸怪地图，东西掉落到脚下#
+                    if (this == MobVacHandler.vacMap) {
+                        spawnDrop(idrop, calcDropPos(pos, MobVacHandler.vacPlayer.getPosition()), mob, chr, droptype, de.questid);
+                    } else {
+                        spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questid);
+                    }
                 }
                 d++;
             }

@@ -6,12 +6,10 @@ import org.gms.client.inventory.InventoryType;
 import org.gms.client.status.MonsterStatus;
 import org.gms.client.status.MonsterStatusEffect;
 import org.gms.constants.skills.Crusader;
-import org.gms.constants.skills.ILWizard;
 
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.StatEffect;
 import org.gms.server.life.Monster;
-import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapleMap;
 
 import java.awt.*;
@@ -20,11 +18,11 @@ import java.util.Map;
 
 public class MobVacHandler {
 
-    public static volatile int mapId;
     public static volatile Thread mobBuffThread;
 
-    private static volatile Point vacPosition = null;
-    private static volatile MapleMap vacMap = null;
+    public static volatile Point vacPosition = null;
+    public static volatile MapleMap vacMap = null;
+    public static volatile Character vacPlayer = null;
 
     private static final boolean AUTO_SALE = false;
 
@@ -44,6 +42,7 @@ public class MobVacHandler {
         vacMap = currentMap;
         vacPosition = player.getPosition();
         vacMap.setVacPoint(vacPosition);
+        vacPlayer = player;
 
         // 移动所有怪物到新的刷怪点
         for (Monster monster : vacMap.getAllMonsters()) {
@@ -58,6 +57,7 @@ public class MobVacHandler {
     }
 
     public synchronized static void mobVacStop(Character player) {
+        vacPlayer = null;
         vacPosition = null;
         if (vacMap != null) {
             vacMap.setVacPoint(null);

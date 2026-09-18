@@ -88,7 +88,7 @@ public class CommonService {
     }
 
     public List<InformationResult> getInformation(InformationSearch condition) {
-        RequireUtil.requireNotEmpty(condition.getFilter(), I18nUtil.getExceptionMessage("PARAMETER_SHOULD_NOT_EMPTY", "filter"));
+        // RequireUtil.requireNotEmpty(condition.getFilter(), I18nUtil.getExceptionMessage("PARAMETER_SHOULD_NOT_EMPTY", "filter"));
         if (RequireUtil.isEmpty(condition.getTypes())) {
             condition.setTypes(Stream.of(InformationType.values()).map(InformationType::getType).collect(Collectors.toList()));
         }

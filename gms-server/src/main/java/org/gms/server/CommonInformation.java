@@ -1,5 +1,6 @@
 package org.gms.server;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gms.constants.api.InformationType;
 import org.gms.exception.BizException;
 import org.gms.model.pojo.InformationSearch;
@@ -120,6 +121,9 @@ public class CommonInformation {
             String id = child.getName();
             String name = DataTool.getString("mapName", child, "");
             String desc = DataTool.getString("streetName", child, "");
+            if (StringUtils.isBlank(name)) {
+                continue;
+            }
             if (isMatch(id, name, filter, filterType, fullMatch)) {
                 results.add(InformationResult.builder()
                         .type(infType.getType())

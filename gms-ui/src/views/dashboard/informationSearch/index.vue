@@ -327,11 +327,12 @@
 
   const searchData = async () => {
     if (!condition.value.filter) {
-      Message.error({
-        content: t('informationSearch.check.filter'),
-        duration: 3 * 1000,
-      });
-      return;
+      condition.value.filter = '';
+      // Message.error({
+      //   content: t('informationSearch.check.filter'),
+      //   duration: 3 * 1000,
+      // });
+      // return;
     }
     setLoading(true);
     try {

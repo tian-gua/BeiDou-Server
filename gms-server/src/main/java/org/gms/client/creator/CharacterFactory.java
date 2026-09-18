@@ -26,6 +26,7 @@ import org.gms.client.inventory.Inventory;
 import org.gms.client.inventory.InventoryType;
 import org.gms.client.inventory.Item;
 import org.gms.config.GameConfig;
+import org.gms.melon.MelonConfig;
 import org.gms.net.server.Server;
 import org.gms.util.I18nUtil;
 import org.slf4j.Logger;
@@ -59,6 +60,8 @@ public abstract class CharacterFactory {
         newCharacter.setLevel(recipe.getLevel());
         newCharacter.setJob(recipe.getJob());
         newCharacter.setMapId(recipe.getMap());
+
+        newCharacter.setFame(MelonConfig.INIT_FAME);
 
         Inventory equipped = newCharacter.getInventory(InventoryType.EQUIPPED);
         ItemInformationProvider ii = ItemInformationProvider.getInstance();

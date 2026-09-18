@@ -6,6 +6,8 @@ public class MelonConfig {
 
     // buff 时间
     public static final Integer MULTI_BUFF_TIME = 3;
+    // 新角色 人气值
+    public static final Integer INIT_FAME = 999;
 
     public static final Map<String, Integer> MY_INT_CONFIG = Map.ofEntries(
             Map.entry("item_limit_on_map", 500), // 地图上允许的最大物品数量

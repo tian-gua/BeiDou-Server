@@ -22,6 +22,7 @@ public class MelonConfig {
             Map.entry("level_up_sp_gain", 0), // 升级获得的技能点，新手不受此影响
             Map.entry("trade_limit_meso_under_level", -1), // 小于等于该等级的角色每天允许交易的金币将有金额限制，值为-1时则不限制等级
             Map.entry("trade_limit_meso_max", -1), // 限制特定等级以下的角色每天允许交易的金币额度。值为-1时则不限制金额。
+            Map.entry("item_slot_max", 9999),
 
             Map.entry("test", 0) // 占位符
     );

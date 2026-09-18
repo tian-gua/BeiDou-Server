@@ -380,6 +380,13 @@ public class GameConfig {
         if (valueProp == null) {
             return (short) 0;
         }
+
+        // 覆盖原有的配置获取方式，优先从 MelonConfig 获取
+        Short val = MelonConfig.getInt(key) != null ? MelonConfig.getInt(key).shortValue() : null;
+        if (val != null) {
+            return val;
+        }
+
         return valueProp.getShortValue("value");
     }
 

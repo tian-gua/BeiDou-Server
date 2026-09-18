@@ -7,6 +7,7 @@ import org.gms.client.status.MonsterStatus;
 import org.gms.client.status.MonsterStatusEffect;
 import org.gms.constants.skills.Crusader;
 
+import org.gms.constants.skills.ILWizard;
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.StatEffect;
 import org.gms.server.life.Monster;
@@ -77,10 +78,10 @@ public class MobVacHandler {
 
         if (mse == null) {
             // 给新生的怪附加一个眩晕技能
-            var skill = SkillFactory.getSkill(Crusader.SHOUT);
+            var skill = SkillFactory.getSkill(ILWizard.COLD_BEAM);
             StatEffect effect = skill.getEffect(skill.getMaxLevel());
             mse = new MonsterStatusEffect(
-                    Map.of(MonsterStatus.STUN, effect.getX()),
+                    Map.of(MonsterStatus.FREEZE, effect.getX()),
                     skill,
                     null,
                     false
@@ -141,9 +142,9 @@ public class MobVacHandler {
 
     private static void applyBuff(Character player, Monster monster) {
         List<MonsterStatus> alreadyBuffed = monster.getAlreadyBuffed();
-        if (!alreadyBuffed.contains(MonsterStatus.STUN)) {
+        if (!alreadyBuffed.contains(MonsterStatus.FREEZE)) {
             monster.applyStatus(player, mse, false, 100);
+            monster.resetMobPosition(vacPosition);
         }
-        monster.resetMobPosition(vacPosition);
     }
 }

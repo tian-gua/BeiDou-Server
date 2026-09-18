@@ -707,12 +707,7 @@ public class MapleMap {
                     } else {
                         idrop = new Item(de.itemId, (short) 0, (short) ((de.Maximum != 1 && de.Maximum > de.Minimum)? Randomizer.nextInt(de.Maximum - de.Minimum) + de.Minimum : de.Maximum));
                     }
-                    // #吸怪地图，东西掉落到脚下#
-                    if (this == MobVacHandler.vacMap) {
-                        spawnDrop(idrop, calcDropPos(pos, MobVacHandler.vacPlayer.getPosition()), mob, chr, droptype, de.questid);
-                    } else {
-                        spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questid);
-                    }
+                    spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questid);
                 }
                 d++;
             }

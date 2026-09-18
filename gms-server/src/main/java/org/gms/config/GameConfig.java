@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import org.gms.dao.entity.GameConfigDO;
 import org.gms.manager.ServerManager;
+import org.gms.melon.MelonConfig;
 import org.gms.net.server.Server;
 import org.gms.net.server.world.World;
 import org.gms.server.life.MonsterInformationProvider;
@@ -324,6 +325,13 @@ public class GameConfig {
         if (valueProp == null) {
             return 0;
         }
+
+        // 覆盖原有的配置获取方式，优先从 MelonConfig 获取
+        Integer val = MelonConfig.getInt(key);
+        if (val != null) {
+            return val;
+        }
+
         return valueProp.getIntValue("value");
     }
 
@@ -388,6 +396,13 @@ public class GameConfig {
         if (valueProp == null) {
             return 0F;
         }
+
+        // 覆盖原有的配置获取方式，优先从 MelonConfig 获取
+        Float val = MelonConfig.getFloat(key);
+        if (val != null) {
+            return val;
+        }
+
         return valueProp.getFloatValue("value");
     }
 
@@ -436,6 +451,13 @@ public class GameConfig {
         if (valueProp == null) {
             return false;
         }
+
+        // 覆盖原有的配置获取方式，优先从 MelonConfig 获取
+        Boolean val = MelonConfig.getBool(key);
+        if (val != null) {
+            return val;
+        }
+
         return valueProp.getBooleanValue("value");
     }
 

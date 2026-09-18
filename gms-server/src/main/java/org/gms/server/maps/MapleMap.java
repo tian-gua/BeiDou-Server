@@ -36,6 +36,8 @@ import org.gms.constants.game.GameConstants;
 import org.gms.constants.id.MapId;
 import org.gms.constants.id.MobId;
 import org.gms.constants.inventory.ItemConstants;
+import org.gms.melon.MelonConfig;
+import org.gms.melon.MelonHelper;
 import org.gms.melon.MobVacHandler;
 import org.gms.net.packet.Packet;
 import org.gms.net.server.Server;
@@ -661,6 +663,13 @@ public class MapleMap {
     private byte dropItemsFromMonsterOnMap(List<MonsterDropEntry> dropEntry, Point pos, byte d, float chRate, byte droptype, int mobpos, Character chr, Monster mob) {
         if (dropEntry.isEmpty()) {
             return d;
+        }
+
+        if (MelonConfig.DISABLE_BOOK_DROP) {
+            dropEntry.removeIf(de -> MelonHelper.isBook(de.itemId));
+            if (dropEntry.isEmpty()) {
+                return d;
+            }
         }
 
         Collections.shuffle(dropEntry);

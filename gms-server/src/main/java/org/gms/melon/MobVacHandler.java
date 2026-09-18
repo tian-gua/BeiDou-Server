@@ -5,6 +5,7 @@ import org.gms.client.SkillFactory;
 import org.gms.client.inventory.InventoryType;
 import org.gms.client.status.MonsterStatus;
 import org.gms.client.status.MonsterStatusEffect;
+import org.gms.constants.skills.Crusader;
 import org.gms.constants.skills.ILWizard;
 
 import org.gms.server.ItemInformationProvider;
@@ -20,8 +21,7 @@ import java.util.Map;
 public class MobVacHandler {
 
     public static volatile int mapId;
-    public static Thread t;
-    private static volatile boolean running; // 标志位，用于控制线程运行状态
+    public static volatile Thread mobBuffThread;
 
     private static volatile Point vacPosition = null;
     private static volatile MapleMap vacMap = null;
@@ -30,41 +30,19 @@ public class MobVacHandler {
 
     private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
-    public synchronized static void mobVac(Character player) {
-        mobVac(!running, player);
-    }
+    private static MonsterStatusEffect mse;
 
-    public synchronized static void mobVac(boolean on, Character player) {
-        if (on && running) {
-            player.dropMessage("吸怪已开启，无需重复开启。");
-            return;
-        }
+    public synchronized static void mobVacStart(Character player) {
+        MapleMap currentMap = player.getMap();
 
-        if (!on && !running) {
-            player.dropMessage("吸怪已关闭，无需重复关闭。");
-            return;
-        }
-
-        if (on && !running) {
-            start(player);
-            player.dropMessage("吸怪已开启。");
-            return;
-        }
-
-        if (!on && running) {
-            stop();
-            player.dropMessage("吸怪已关闭。");
-        }
-    }
-
-    public synchronized static void setSpawnPoint(Character player) {
         // clear last spawn point first
-        if (vacMap != null) {
+        if (vacMap != null && vacMap != currentMap) {
             vacMap.setVacPoint(null);
+            vacMap.killAllMonsters();
         }
 
+        vacMap = currentMap;
         vacPosition = player.getPosition();
-        vacMap = player.getMap();
         vacMap.setVacPoint(vacPosition);
 
         // 移动所有怪物到新的刷怪点
@@ -75,9 +53,11 @@ public class MobVacHandler {
         }
 
         player.dropMessage("刷怪点已设置为当前位置。");
+
+        startMobBuffThread(player);
     }
 
-    public synchronized static void clearSpawnPoint(Character player) {
+    public synchronized static void mobVacStop(Character player) {
         vacPosition = null;
         if (vacMap != null) {
             vacMap.setVacPoint(null);
@@ -85,74 +65,44 @@ public class MobVacHandler {
         }
 
         player.dropMessage("刷怪点已清除。");
+
+        stopMobBuffThread(player);
     }
 
-    public synchronized static void resetPosition(Character player) {
-        if (!running) {
-            player.dropMessage("吸怪未开启，无法重置位置。");
+    public synchronized static void startMobBuffThread(Character player) {
+        if (mobBuffThread != null && mobBuffThread.isAlive()) {
+            player.message("buff线程已经在运行中。");
             return;
         }
-        vacPosition = player.getPosition();
-        vacMap.setVacPoint(vacPosition);
 
-        // 清空怪物
-        // vacMap.resetMapObjects();
+        if (mse == null) {
+            // 给新生的怪附加一个眩晕技能
+            var skill = SkillFactory.getSkill(Crusader.SHOUT);
+            StatEffect effect = skill.getEffect(skill.getMaxLevel());
+            mse = new MonsterStatusEffect(
+                    Map.of(MonsterStatus.STUN, effect.getX()),
+                    skill,
+                    null,
+                    false
+            );
+        }
 
-        player.dropMessage("吸怪位置已重置。");
-    }
-
-    public synchronized static void start(Character player) {
-        vacPosition = player.getPosition();
-        vacMap = player.getMap();
-        vacMap.setVacPoint(vacPosition);
-        running = true; // 启动线程时设置标志位为 true
-        t = new Thread(() -> {
+        mobBuffThread = new Thread(() -> {
+            player.message("buff线程已启动。");
             int loopCount = 0;
+            while (!Thread.currentThread().isInterrupted()) {
+                loopCount++;
 
-            while (running) {
-                // 在这里实现线程的主要逻辑
-                var allPlayer = vacMap.getAllPlayer();
-                if (allPlayer.size() > 1) {
-                    for (MapObject mo : allPlayer) {
-                        if (mo.getObjectId() != player.getObjectId()) {
-                            var mapPlayer = (Character) mo;
-                            if (mapPlayer.getParty() == null || player.getParty() == null || mapPlayer.getParty()
-                                    .getId() != player.getParty().getId()) {
-                                running = false;
-                                vacMap.setVacPoint(null);
-                                vacPosition = null;
-                                player.dropMessage("吸怪已关闭。");
-
-                                // 清空怪物
-                                vacMap.resetMapObjects();
-
-                                break;
-                            }
+                if (vacMap != null) {
+                    for (Monster monster : vacMap.getAllMonsters()) {
+                        if (!monster.isBoss() && monster.isAlive()) {
+                            applyBuff(player, monster);
                         }
-                    }
-                } else if (allPlayer.isEmpty() || allPlayer.getFirst().getObjectId() != player.getObjectId()) {
-
-                    running = false;
-                    vacMap.setVacPoint(null);
-                    vacPosition = null;
-                    player.dropMessage("吸怪已关闭。");
-
-                    // 清空怪物
-                    vacMap.resetMapObjects();
-
-                    break; // 如果地图上没有玩家了，或者地图上有玩家但不是当前玩家，则停止线程
-
-                }
-
-                for (Monster monster : vacMap.getAllMonsters()) {
-                    if (!monster.isBoss() && monster.isAlive()) {
-                        applyBuff(player, monster);
                     }
                 }
 
                 if (AUTO_SALE) {
-                    loopCount++;
-                    if (loopCount >= 60) {
+                    if (loopCount >= 100) {
                         short numFreeSlot = player.getInventory(InventoryType.EQUIP).getNumFreeSlot();
                         if (numFreeSlot < 8) {
                             int mesoGain = player.sellAllItemsFromPosition(ii, InventoryType.EQUIP, (short) 25);
@@ -163,47 +113,37 @@ public class MobVacHandler {
                 }
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1000); // 每秒检查一次
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // 恢复中断状态
+                    break;
                 }
             }
+            player.message("buff线程已停止。");
         });
-        t.start();
+        mobBuffThread.start();
+    }
+
+    public synchronized static void stopMobBuffThread(Character player) {
+        if (mobBuffThread != null) {
+            // 如果线程正在sleep，中断它以立即响应flag变化
+            mobBuffThread.interrupt();
+            try {
+                mobBuffThread.join(); // 等待线程结束
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // 恢复中断状态
+                return;
+            }
+            mobBuffThread = null;
+        } else {
+            player.message("buff线程未运行。");
+        }
     }
 
     private static void applyBuff(Character player, Monster monster) {
         List<MonsterStatus> alreadyBuffed = monster.getAlreadyBuffed();
-        if (!alreadyBuffed.contains(MonsterStatus.FREEZE)) {
-            // 给新生的怪附加一个定身技能
-            var skill = SkillFactory.getSkill(ILWizard.COLD_BEAM);
-            StatEffect effect = skill.getEffect(skill.getMaxLevel());
-            MonsterStatusEffect mse = new MonsterStatusEffect(
-                    Map.of(MonsterStatus.FREEZE, effect.getX()),
-                    skill, null, false
-            );
-            monster.applyStatus(player, mse, false, (long) effect.getDuration() * 100);
+        if (!alreadyBuffed.contains(MonsterStatus.STUN)) {
+            monster.applyStatus(player, mse, false, 100);
         }
         monster.resetMobPosition(vacPosition);
     }
-
-    public synchronized static void stop() {
-        running = false; // 设置标志位为 false，通知线程停止
-        vacPosition = null;
-        vacMap.setVacPoint(null); // 清除地图上的吸怪点
-
-        // 清空怪物
-        vacMap.resetMapObjects();
-
-        if (t != null) {
-            // 如果线程正在sleep，中断它以立即响应flag变化
-            t.interrupt();
-            try {
-                t.join(); // 等待线程结束
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // 恢复中断状态
-            }
-        }
-    }
 }
-

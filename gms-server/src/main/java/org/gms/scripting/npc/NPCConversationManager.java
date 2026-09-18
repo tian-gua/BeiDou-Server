@@ -1516,22 +1516,6 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         }
     }
 
-    public void mobVac(boolean on) {
-        MobVacHandler.mobVac(on, getPlayer());
-    }
-
-    public void fixedSpawn(boolean on) {
-        if (on) {
-            MobVacHandler.setSpawnPoint(getPlayer());
-        } else {
-            MobVacHandler.clearSpawnPoint(getPlayer());
-        }
-    }
-
-    public void resetMobVacPosition() {
-        MobVacHandler.resetPosition(getPlayer());
-    }
-
     public Equip getInventoryEquip(int slot) {
         var item = getPlayer().getInventory(InventoryType.EQUIP).getItem((byte) slot);
         if (item == null) {

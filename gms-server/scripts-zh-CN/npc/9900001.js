@@ -51,19 +51,12 @@ function action(mode, type, selection) {
         text += " \r\n\r\n";
 
         text += "#L3#传送自由#l \t #L71#超级传送#l \t #L1005#快捷商店#l\r\n";
-        // text += "#L0#新人福利#l \t #L2#在线奖励#l \t #L1#每日签到#l\r\n";
         text += "#L4#爆率一览#l \t #L1001#技能全满#l \t #L69#快速转职#l\r\n"
-        // text += "#L1007#快速卖装#l \t #L1006#装备开槽#l \t #L1008#装备升星#l\r\n"
-        text += "#L5#野外BOSS刷新#l \t #L1007#快速卖装#l \t #L1008#装备升星#l\r\n"
+        // text += "#L1006#装备开槽#l \t #L1008#装备升星#l\r\n"
+        text += "#L1007#快速卖装#l \t #L1008#装备升星#l\r\n"
         text += "\r\n"
-        text += "#L1003#偷学稳如泰山#l \t #L1002#偷学二段跳#l\r\n"
-        // text += "#L999#测试脚本>>>未上线#l \t \r\n";
-        text += "#L1103#定点生怪#l \t #L1104#正常生怪#l\r\n";
+        text += "#L1003#学稳如泰山#l \t #L1002#学二段跳#l\r\n"
         text += "\r\n"
-        // if (cm.getClient().getAccountName() === "tiangua") {
-        //     // text += "#L1100#开启吸怪#l \t #L1101#关闭吸怪#l \t #L1102#刷新位置#l\r\n";
-        //     text += "#L1103#定点生怪#l \t #L1104#正常生怪#l\r\n";
-        // }
 
 		// text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
 		// text += "#L71#超级传送#l \t #L4#爆率一览#l \t #L2#在线奖励#l\r\n";
@@ -158,32 +151,8 @@ function doSelect(selection) {
             cm.newKeyboardSkill(57, 1, 4111006) // 二段跳 空格
             cm.dispose();
             break;
-        case 1100:
-            cm.mobVac(true);
-            cm.dispose();
-            break;
-        case 1101:
-            cm.mobVac(false);
-            cm.dispose();
-            break;
-        case 1102:
-            cm.resetMobVacPosition();
-            cm.dispose();
-            break;
-        case 1103:
-            cm.fixedSpawn(true);
-            cm.dispose();
-            break;
-        case 1104:
-            cm.fixedSpawn(false);
-            cm.dispose();
-            break;
         case 1003:
             cm.newKeyboardSkill(47, 1, 1121002) // 稳如泰山 V
-            cm.dispose();
-            break;
-        case 1004:
-            cm.clearSP();
             cm.dispose();
             break;
         case 1005:

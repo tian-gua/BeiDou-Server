@@ -38,8 +38,14 @@ public class MelonCommand {
                     continue;
                 }
                 player.message(String.format("%s 掉落: \n", monsterName));
-                for (MonsterDropEntry monsterDropEntry : monsterDropEntries) {
-                    player.message(String.format("          - %s (%d)", itemInformationProvider.getName(monsterDropEntry.itemId), monsterDropEntry.chance));
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < monsterDropEntries.size(); i++) {
+                    MonsterDropEntry monsterDropEntry = monsterDropEntries.get(i);
+                    sb.append(String.format("[%s]", itemInformationProvider.getName(monsterDropEntry.itemId)));
+                    if (i == monsterDropEntries.size() - 1 || (i + 1) % 3 == 0) {
+                        player.message(sb.toString());
+                        sb = new StringBuilder();
+                    }
                 }
             }
         }
@@ -47,23 +53,23 @@ public class MelonCommand {
 
     public static class MobVac extends Command {
         {
-            setDescription("吸怪");
+            setDescription("定点吸怪");
         }
 
         @Override
         public void execute(Client c, String[] params) {
-            MobVacHandler.mobVac(c.getPlayer());
+            MobVacHandler.mobVacStart(c.getPlayer());
         }
     }
 
-    public static class MobVacReset extends Command {
+    public static class MobVacStop extends Command {
         {
-            setDescription("吸怪点重置");
+            setDescription("定点吸怪停止");
         }
 
         @Override
         public void execute(Client c, String[] params) {
-            MobVacHandler.resetPosition(c.getPlayer());
+            MobVacHandler.mobVacStop(c.getPlayer());
         }
     }
 }

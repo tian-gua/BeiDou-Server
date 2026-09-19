@@ -10,6 +10,8 @@ public class MelonConfig {
     public static final Integer INIT_FAME = 999;
     // 禁止掉落技能书
     public static final Boolean DISABLE_BOOK_DROP = true;
+    // 技能无冷却
+    public static final Boolean SKILL_NO_COOLDOWN = true;
 
     public static final Map<String, Integer> MY_INT_CONFIG = Map.ofEntries(
             Map.entry("item_limit_on_map", 500), // 地图上允许的最大物品数量

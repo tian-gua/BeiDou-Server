@@ -15,7 +15,7 @@ public class EquipEnhanceHandler {
 
     private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
-    public static boolean enhance(Character player, int maxStar, boolean useMaple) {
+    public static boolean enhance(Character player, int maxStar, boolean useProtectScroll) {
         // 获取装备背包第一格的装备
         var item = player.getInventory(InventoryType.EQUIP).getItem((short) 1);
         if (item == null) {
@@ -56,21 +56,6 @@ public class EquipEnhanceHandler {
             curMp = equip.getMp();
 
             double ratio = 0.3;
-
-            // random [0-100)，小于 70，ratio = 0.1，大于 70，ratio = 0.2，大于 90，ratio = 0.3
-//            int rand = Randomizer.nextInt(100);
-//            if (rand < 70) {
-//                ratio = 0.1;
-//                player.message("属性提升幅度为 10%");
-//            } else if (rand < 90) {
-//                ratio = 0.2;
-//                player.message("属性提升幅度为 20%");
-//            } else {
-//                ratio = 0.3;
-//                player.message("属性提升幅度为 30%");
-//            }
-//
-//            log.info("升星成功，随机数: {}, 属性提升幅度: {}", rand, ratio);
 
             // 已存在的属性 提升 ratio%，增加幅度最小为 1
             if (curStr > 0) {
@@ -142,18 +127,31 @@ public class EquipEnhanceHandler {
             InventoryManipulator.addFromDrop(player.getClient(), newEquip, false);
             player.message("升星成功，装备 " + equipName + " 星级提升至 " + (star + 1) + " 星");
         } else {
-            if (useMaple) {
-                player.message("装备 " + equipName + " 升星失败，已被枫叶保护");
+            if (useProtectScroll) {
+                player.message("装备 " + equipName + " 升星失败，已被白医卷轴保护");
             } else {
-                player.message("装备 " + equipName + " 升星失败，已被销毁");
-                InventoryManipulator.removeFromSlot(
-                        player.getClient(),
-                        InventoryType.EQUIP,
-                        (short) 1,
-                        equip.getQuantity(),
-                        false,
-                        false
-                );
+                rand = Randomizer.nextInt(100);
+                if (rand >= 70) {
+                    player.message("装备 " + equipName + " 升星失败，但幸运地保留了装备");
+                    return true;
+                } else {
+                    player.message("装备 " + equipName + " 升星失败，已被销毁");
+                    InventoryManipulator.removeFromSlot(
+                            player.getClient(),
+                            InventoryType.EQUIP,
+                            (short) 1,
+                            equip.getQuantity(),
+                            false,
+                            false
+                    );
+
+                    rand = Randomizer.nextInt(100);
+                    if (rand >= 70) {
+                        // 恭喜你获得了衰神的保护，获得了一张白医卷轴
+                        player.message("恭喜你获得了衰神的青睐，获得了一张白医卷轴");
+                        InventoryManipulator.addById(player.getClient(), 2049000, (short)1);
+                    }
+                }
             }
         }
         return true;

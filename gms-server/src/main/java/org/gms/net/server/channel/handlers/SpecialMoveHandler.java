@@ -33,6 +33,7 @@ import org.gms.constants.skills.Hero;
 import org.gms.constants.skills.Paladin;
 import org.gms.constants.skills.Priest;
 import org.gms.constants.skills.SuperGM;
+import org.gms.melon.MelonConfig;
 import org.gms.net.AbstractPacketHandler;
 import org.gms.net.packet.InPacket;
 import org.gms.net.server.Server;
@@ -88,6 +89,10 @@ public final class SpecialMoveHandler extends AbstractPacketHandler {
                 int cooldownTime = effect.getCooldown();
                 if (StatEffect.isHerosWill(skillid) && GameConfig.getServerBoolean("use_fast_reuse_hero_will")) {
                     cooldownTime /= 60;
+                }
+
+                if (MelonConfig.SKILL_NO_COOLDOWN) {
+                    cooldownTime = 0;
                 }
 
                 c.sendPacket(PacketCreator.skillCooldown(skillid, cooldownTime));

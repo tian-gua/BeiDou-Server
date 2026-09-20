@@ -1,10 +1,12 @@
 package org.gms.melon;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gms.client.Character;
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.life.AbstractLoadedLife;
 import org.gms.server.life.MonsterInformationProvider;
 import org.gms.util.Pair;
+import org.gms.util.StringUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -32,6 +34,8 @@ public class MelonHelper {
     public static List<Pair<String, Integer>> dropList(int monsterId) {
         return monsterInformationProvider.retrieveDrop(monsterId)
                 .stream()
+                .filter(drop -> drop.itemId > 0)
+                .filter(drop -> StringUtils.isNotBlank(itemInformationProvider.getName(drop.itemId)))
                 .map(drop -> new Pair<>(itemInformationProvider.getName(drop.itemId), drop.itemId))
                 .collect(Collectors.toList());
     }

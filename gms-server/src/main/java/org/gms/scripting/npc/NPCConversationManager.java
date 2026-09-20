@@ -1561,6 +1561,8 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
     }
 
     public List<Pair<String, Integer>> getDropList(int monsterId) {
-        return MelonHelper.dropList(monsterId);
+        var pairs = MelonHelper.dropList(monsterId);
+        // log.debug("pairs: {}", pairs);
+        return pairs;
     }
 }

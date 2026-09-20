@@ -13,10 +13,7 @@ function action(mode, type, selection) {
         status--;
     }
 
-    // cm.getPlayer().message("mode=" + mode + ",type=" + type + ",selection=" + selection);
-
     if (status === 0) {
-        var itemId = cm.getInventoryEquip(1).getItemId();
         let text = "你要将背包 25 格之后的装备全部卖掉吗？\r\n\r\n";
         text += "#L0#我再考虑考虑#l\r\n\r\n";
         text += "#L1#卖(保留24)！#l\r\n";

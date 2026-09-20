@@ -5,6 +5,7 @@ function start() {
     status = -1;
     action(1, 0, 0);
 }
+
 function action(mode, type, selection) {
     if (mode === 1) {
         status++;
@@ -12,64 +13,22 @@ function action(mode, type, selection) {
         status--;
     }
 
-    // cm.getPlayer().message("mode=" + mode + ",type=" + type + ",selection=" + selection);
-    // #装备开槽#
+    // #装备升星#
     if (status === 0) {
         var itemId = cm.getInventoryEquip(1).getItemId();
-        let text = "你要为 #r#i" + itemId + "##k升星吗？\r\n 每件装备最多能升 30星，每次升星费用为 10万 金币 和 1个#i4001126#\r\n\r\n";
+        let text = "你要为 #r#i" + itemId + "##k升星吗？\r\n 每件装备最多能升 30星，升星费用为一些金币 和 1个#i4001126#\r\n\r\n";
         text += "#L0#我再考虑考虑#l\r\n\r\n";
-        text += "#L1#普通升星#l\r\n";
-        // text += "#L3#快速5星#l\r\n";
-        text += "#L2#白医升星（#i2049000#）#l\r\n";
+        text += "#L1#普通升星#l\r\n\r\n";
+        text += "#L2#祝福升星（#i2340000#）#l\r\n";
         cm.sendSimple(text);
     } else if (status === 1) {
         if (selection === 0) {
             cm.sendOk("考虑好了再来找我！");
             cm.dispose();
         } else if (selection === 1) {
-            if (cm.getMeso() >= 100000 && cm.itemQuantity(4001126) >= 1) {
-                var result = cm.enhanceEquip(30, false);
-                if (result) {
-                    cm.gainMeso(-100000);
-                    cm.gainItem(4001126, -1);
-                    cm.dispose();
-                } else {
-                    cm.sendOk("升星失败，装备不符合升星条件");
-                    cm.dispose();
-                }
-            } else {
-                cm.sendOk("你的金币或者枫叶不足");
-                cm.dispose();
-            }
+            cm.enhanceEquip(30, false);
         } else if (selection === 2) {
-            if (cm.getMeso() >= 100000 && cm.itemQuantity(2049000) >= 1) {
-                var result = cm.enhanceEquip(30, true);
-                if (result) {
-                    cm.gainMeso(-100000);
-                    cm.gainItem(2049000, -1);
-                    cm.dispose();
-                } else {
-                    cm.sendOk("升星失败，装备不符合升星条件");
-                    cm.dispose();
-                }
-            } else {
-                cm.sendOk("你没有10w金币或者#i2049000#");
-                cm.dispose();
-            }
-        } else if (selection === 3) {
-            if (cm.getMeso() >= 5000000) {
-                var times = cm.quickEnhance(5)
-                if (times > 0) {
-                    cm.gainMeso(-100000 * times);
-                    cm.dispose();
-                } else {
-                    cm.sendOk("升星失败，装备不符合升星条件");
-                    cm.dispose();
-                }
-            } else {
-                cm.sendOk("背包超过500万金币才能快速升星");
-                cm.dispose();
-            }
+            cm.enhanceEquip(30, true);
         } else {
             cm.dispose();
         }

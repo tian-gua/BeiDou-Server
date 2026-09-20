@@ -3,6 +3,8 @@ package org.gms.melon;
 import org.gms.client.Character;
 import org.gms.client.Client;
 import org.gms.client.command.Command;
+import org.gms.client.inventory.InventoryType;
+import org.gms.constants.inventory.ItemConstants;
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.life.Monster;
 import org.gms.server.life.MonsterDropEntry;
@@ -15,6 +17,8 @@ import java.util.Set;
 
 public class MelonCommand {
 
+    public static ItemInformationProvider itemInformationProvider = ItemInformationProvider.getInstance();
+    public static MonsterInformationProvider monsterInformationProvider = MonsterInformationProvider.getInstance();
     public static class MapDrop extends Command {
         {
             setDescription("查询当前地图掉落");
@@ -22,8 +26,6 @@ public class MelonCommand {
 
         @Override
         public void execute(Client c, String[] params) {
-            MonsterInformationProvider monsterInformationProvider = MonsterInformationProvider.getInstance();
-            ItemInformationProvider itemInformationProvider = ItemInformationProvider.getInstance();
             Character player = c.getPlayer();
             MapleMap map = player.getMap();
             Set<Integer> monsterIds = new HashSet<>();
@@ -41,10 +43,13 @@ public class MelonCommand {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < monsterDropEntries.size(); i++) {
                     MonsterDropEntry monsterDropEntry = monsterDropEntries.get(i);
-                    sb.append(String.format("[%s]", itemInformationProvider.getName(monsterDropEntry.itemId)));
-                    if (i == monsterDropEntries.size() - 1 || (i + 1) % 3 == 0) {
-                        player.message(sb.toString());
-                        sb = new StringBuilder();
+                    InventoryType inventoryType = ItemConstants.getInventoryType(monsterDropEntry.itemId);
+                    if (inventoryType.isEquip() || inventoryType.getType() == InventoryType.USE.getType()) {
+                        sb.append(String.format("[%s]", itemInformationProvider.getName(monsterDropEntry.itemId)));
+                        if (i == monsterDropEntries.size() - 1 || (i + 1) % 3 == 0) {
+                            player.message(sb.toString());
+                            sb = new StringBuilder();
+                        }
                     }
                 }
             }

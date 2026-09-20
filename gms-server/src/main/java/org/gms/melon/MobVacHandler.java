@@ -37,7 +37,6 @@ public class MobVacHandler {
         // clear last spawn point first
         if (vacMap != null && vacMap != currentMap) {
             vacMap.setVacPoint(null);
-            vacMap.killAllMonsters();
         }
 
         vacMap = currentMap;
@@ -54,7 +53,7 @@ public class MobVacHandler {
 
         player.dropMessage("刷怪点已设置为当前位置。");
 
-        startMobBuffThread(player);
+        // startMobBuffThread(player);
     }
 
     public synchronized static void mobVacStop(Character player) {
@@ -67,7 +66,7 @@ public class MobVacHandler {
 
         player.dropMessage("刷怪点已清除。");
 
-        stopMobBuffThread(player);
+        // stopMobBuffThread(player);
     }
 
     public synchronized static void startMobBuffThread(Character player) {
@@ -77,7 +76,7 @@ public class MobVacHandler {
         }
 
         if (mse == null) {
-            // 给新生的怪附加一个眩晕技能
+            // 给新生的怪附加一个冰冻技能
             var skill = SkillFactory.getSkill(ILWizard.COLD_BEAM);
             StatEffect effect = skill.getEffect(skill.getMaxLevel());
             mse = new MonsterStatusEffect(

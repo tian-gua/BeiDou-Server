@@ -6,6 +6,7 @@ import org.gms.client.Character;
 import org.gms.client.inventory.Equip;
 import org.gms.client.inventory.InventoryType;
 import org.gms.client.inventory.manipulator.InventoryManipulator;
+import org.gms.constants.inventory.ItemConstants;
 import org.gms.server.ItemInformationProvider;
 import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
@@ -15,12 +16,12 @@ public class EquipEnhanceHandler {
 
     private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
 
-    public static boolean enhance(Character player, int maxStar, boolean useProtectScroll) {
+    public static void enhance(Character player, int maxStar, boolean useProtectScroll) {
         // 获取装备背包第一格的装备
         var item = player.getInventory(InventoryType.EQUIP).getItem((short) 1);
         if (item == null) {
             player.message("请把需要升星的装备放到装备栏第一格");
-            return false;
+            return;
         }
         var equip = (Equip) item;
 
@@ -31,7 +32,43 @@ public class EquipEnhanceHandler {
 
         if (star >= maxStar) {
             player.message(String.format("装备 %s 已经达到最大星级 %d 星，无法继续升星", equipName, maxStar));
-            return false;
+            return;
+        }
+
+        if (player.getMeso() < (star + 1) * 10000) {
+            player.message(String.format("升星失败，金币不足，升星需要 %d 金币", (star + 1) * 10000));
+            return;
+        }
+
+        if (player.countItem(4001126) < 1) {
+            player.message("升星失败，缺少枫叶材料");
+            return;
+        }
+
+        if (useProtectScroll && player.countItem(2340000) < 1) {
+            player.message("升星失败，缺少祝福卷轴");
+            return;
+        }
+
+        InventoryManipulator.addById(player.getClient(), 2049000, (short) -1);
+        player.gainMeso(-(star + 1) * 10000, false);
+        InventoryManipulator.removeById(
+                player.getClient(),
+                ItemConstants.getInventoryType(4001126),
+                4001126,
+                1,
+                true,
+                false
+        );
+        if (useProtectScroll) {
+            InventoryManipulator.removeById(
+                    player.getClient(),
+                    ItemConstants.getInventoryType(2340000),
+                    2340000,
+                    1,
+                    true,
+                    false
+            );
         }
 
         int rand = Randomizer.nextInt(100);
@@ -128,12 +165,11 @@ public class EquipEnhanceHandler {
             player.message("升星成功，装备 " + equipName + " 星级提升至 " + (star + 1) + " 星");
         } else {
             if (useProtectScroll) {
-                player.message("装备 " + equipName + " 升星失败，已被白医卷轴保护");
+                player.message("装备 " + equipName + " 升星失败，已被祝福卷轴保护，装备未被销毁");
             } else {
                 rand = Randomizer.nextInt(100);
                 if (rand >= 70) {
                     player.message("装备 " + equipName + " 升星失败，但幸运地保留了装备");
-                    return true;
                 } else {
                     player.message("装备 " + equipName + " 升星失败，已被销毁");
                     InventoryManipulator.removeFromSlot(
@@ -145,45 +181,9 @@ public class EquipEnhanceHandler {
                             false
                     );
 
-                    rand = Randomizer.nextInt(100);
-                    if (rand >= 70) {
-                        // 恭喜你获得了衰神的保护，获得了一张白医卷轴
-                        player.message("恭喜你获得了衰神的青睐，获得了一张白医卷轴");
-                        InventoryManipulator.addById(player.getClient(), 2049000, (short)1);
-                    }
                 }
             }
         }
-        return true;
-    }
-
-    public static int quickEnhance(Character player, int targetStar, boolean useMaple) {
-        // loop enhance until reach target star
-        int times = 0;
-        while (true) {
-            var item = player.getInventory(InventoryType.EQUIP).getItem((short) 1);
-            if (item == null) {
-                player.message("请把需要升星的装备放到装备栏第一格");
-                break;
-            }
-
-            var equip = (Equip) item;
-            int star = getStar(equip);
-            if (star >= targetStar) {
-                player.message("装备 " + ii.getName(equip.getItemId()) + " 已经达到目标星级 " + targetStar + " 星，停止升星");
-                break;
-            }
-
-            boolean success = enhance(player, targetStar, useMaple);
-            if (!success) {
-                break;
-            }
-
-            times++;
-        }
-
-        player.message("共尝试升星 " + times + " 次");
-        return times;
     }
 
     private static int getStar(Equip equip) {

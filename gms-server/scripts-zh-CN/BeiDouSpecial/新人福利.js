@@ -7,8 +7,8 @@
  */
 
 var status;
-var mesoQty;    // 金币数量
-var cashQty;    // 点券数量
+var mesoQty = 100;    // 金币数量
+var cashQty = 10;    // 点券数量
 
 //Start
 function start()
@@ -32,10 +32,6 @@ function action(mode, type, selection)
 			}
 			else
 			{
-				// 生成随机数量
-				mesoQty = Math.floor(Math.random() * 501) + 500;     // 金币随机50-100万（可以根据需要调整）
-				cashQty = Math.floor(Math.random() * 101) + 100;  // 点券随机100-200
-
 				cm.sendAcceptDecline("您确定要领取新手礼包吗？一个角色#r限领一次。#k\n\n\r\n"
 					+ "获得奖励：\n"
 					+ "#b" + mesoQty + "#k 万金币\n"

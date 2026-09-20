@@ -35,6 +35,7 @@ import org.gms.constants.inventory.ItemConstants;
 import org.gms.constants.string.LanguageConstants;
 import org.gms.manager.ServerManager;
 import org.gms.melon.EquipEnhanceHandler;
+import org.gms.melon.MelonHelper;
 import org.gms.melon.MobVacHandler;
 import org.gms.model.pojo.NextLevelContext;
 import org.gms.net.server.Server;
@@ -45,8 +46,10 @@ import org.gms.net.server.guild.Guild;
 import org.gms.net.server.guild.GuildPackets;
 import org.gms.net.server.world.Party;
 import org.gms.net.server.world.PartyCharacter;
+import org.gms.server.life.Monster;
 import org.gms.service.GachaponService;
 import org.gms.util.I18nUtil;
+import org.gms.util.Pair;
 import org.gms.util.packets.WeddingPackets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1549,11 +1552,15 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         getPlayer().sellAllItemsFromPosition(ii,InventoryType.EQUIP, (short)position);
     }
 
-    public boolean enhanceEquip(int maxStar, boolean useMaple) {
-        return EquipEnhanceHandler.enhance(getPlayer(), maxStar, useMaple);
+    public void enhanceEquip(int maxStar, boolean useMaple) {
+        EquipEnhanceHandler.enhance(getPlayer(), maxStar, useMaple);
     }
 
-    public int quickEnhance(int targetStar) {
-        return EquipEnhanceHandler.quickEnhance(getPlayer(), targetStar, false);
+    public List<Pair<String, Integer>> currentMapMonster() {
+        return MelonHelper.currentMapMonster(getPlayer());
+    }
+
+    public List<Pair<String, Integer>> getDropList(int monsterId) {
+        return MelonHelper.dropList(monsterId);
     }
 }

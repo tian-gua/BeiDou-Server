@@ -50,12 +50,16 @@ function action(mode, type, selection) {
         text += "当前金币：" + cm.getPlayer().getMeso() + "\r\n";
         text += " \r\n\r\n";
 
+
+        text += "#L0#新人福利#l \t #L1#每日签到#l  \t #L2#在线奖励#l\r\n\r\n";
+
         text += "#L3#传送自由#l \t #L71#超级传送#l \t #L1005#快捷商店#l\r\n";
-        text += "#L4#爆率一览#l \t #L1001#技能全满#l \t #L69#快速转职#l\r\n"
+        text += "#L1011#掉落查询#l \t #L1001#技能全满#l \t #L69#快速转职#l\r\n"
         // text += "#L1006#装备开槽#l \t #L1008#装备升星#l\r\n"
         text += "#L1007#快速卖装#l \t #L1008#装备升星#l\r\n"
         text += "\r\n"
-        text += "#L1003#学稳如泰山#l \t #L1002#学二段跳#l\r\n"
+        text += "#L1010#偷学技能#l\r\n"
+        // text += "#L1003#学稳如泰山#l \t #L1002#学二段跳#l\r\n"
         text += "\r\n"
 
 		// text += "#L3#传送自由#l \t #L69#快速转职#l \t #L70#学习技能#l\r\n";
@@ -168,6 +172,15 @@ function doSelect(selection) {
             break;
         case 1007:
             openNpc("快速卖装");
+            break;
+        case 1010:
+            cm.newKeyboardSkill(57, 1, 4111006) // 二段跳 空格
+            cm.newKeyboardSkill(47, 1, 1121002) // 稳如泰山 V
+            cm.sendSimple("你已经学会了 【二段跳】 和 【稳如泰山】，请打开键盘查看。");
+            cm.dispose();
+            break;
+        case 1011:
+            openNpc("掉落查询");
             break;
         default:
             cm.sendOk("该功能暂不支持，敬请期待！");

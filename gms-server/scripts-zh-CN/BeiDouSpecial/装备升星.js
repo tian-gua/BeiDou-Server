@@ -27,8 +27,10 @@ function action(mode, type, selection) {
             cm.dispose();
         } else if (selection === 1) {
             cm.enhanceEquip(30, false);
+            cm.dispose();
         } else if (selection === 2) {
             cm.enhanceEquip(30, true);
+            cm.dispose();
         } else {
             cm.dispose();
         }

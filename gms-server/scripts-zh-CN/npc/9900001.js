@@ -176,7 +176,7 @@ function doSelect(selection) {
         case 1010:
             cm.newKeyboardSkill(57, 1, 4111006) // 二段跳 空格
             cm.newKeyboardSkill(47, 1, 1121002) // 稳如泰山 V
-            cm.sendSimple("你已经学会了 【二段跳】 和 【稳如泰山】，请打开键盘查看。");
+            cm.sendOk("你已经学会了 【二段跳】 和 【稳如泰山】，请打开键盘查看。");
             cm.dispose();
             break;
         case 1011:

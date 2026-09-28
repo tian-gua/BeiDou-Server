@@ -707,6 +707,7 @@ public class MapleMap {
                     } else {
                         idrop = new Item(de.itemId, (short) 0, (short) ((de.Maximum != 1 && de.Maximum > de.Minimum)? Randomizer.nextInt(de.Maximum - de.Minimum) + de.Minimum : de.Maximum));
                     }
+
                     spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questid);
                 }
                 d++;
@@ -744,6 +745,7 @@ public class MapleMap {
         return d;
     }
 
+    // #怪物掉落#
     private void dropFromMonster(final Character chr, final Monster mob, final boolean useBaseRate) {
         if (mob.dropsDisabled() || !dropsOn) {
             return;
@@ -1152,7 +1154,12 @@ public class MapleMap {
         }
     }
 
-    private void spawnDrop(final Item idrop, final Point dropPos, final MapObject dropper, final Character chr, final byte droptype, final short questid) {
+    private void spawnDrop(final Item idrop,Point dropPos, final MapObject dropper, final Character chr, final byte droptype, final short questid) {
+        // #怪物掉落到脚下#
+        if (chr != null && vacPoint != null) {
+            dropPos = chr.getPosition();
+        }
+        final Point finalDropPos = dropPos;
         final MapItem mdrop = new MapItem(idrop, dropPos, dropper, chr, chr.getClient(), droptype, false, questid);
         mdrop.setDropTime(Server.getInstance().getCurrentTime());
         spawnAndAddRangedMapObject(mdrop, c -> {
@@ -1161,7 +1168,7 @@ public class MapleMap {
             if (chr1.needQuestItem(questid, idrop.getItemId())) {
                 mdrop.lockItem();
                 try {
-                    c.sendPacket(PacketCreator.dropItemFromMapObject(chr1, mdrop, dropper.getPosition(), dropPos, (byte) 1));
+                    c.sendPacket(PacketCreator.dropItemFromMapObject(chr1, mdrop, dropper.getPosition(), finalDropPos, (byte) 1));
                 } finally {
                     mdrop.unlockItem();
                 }
@@ -1173,14 +1180,19 @@ public class MapleMap {
     }
 
     public final void spawnMesoDrop(final int meso, final Point position, final MapObject dropper, final Character owner, final boolean playerDrop, final byte droptype) {
-        final Point droppos = calcDropPos(position, position);
+        Point droppos = calcDropPos(position, position);
+        // #怪物掉落到脚下#
+        if (owner != null && vacPoint != null) {
+            droppos = owner.getPosition();
+        }
+        final Point finalDropPos = droppos;
         final MapItem mdrop = new MapItem(meso, droppos, dropper, owner, owner.getClient(), droptype, playerDrop);
         mdrop.setDropTime(Server.getInstance().getCurrentTime());
 
         spawnAndAddRangedMapObject(mdrop, c -> {
             mdrop.lockItem();
             try {
-                c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), droppos, (byte) 1));
+                c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), finalDropPos, (byte) 1));
             } finally {
                 mdrop.unlockItem();
             }

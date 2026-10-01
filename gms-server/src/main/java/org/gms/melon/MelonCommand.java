@@ -126,6 +126,12 @@ public class MelonCommand {
                 } catch (Exception e) {
                     c.getPlayer().dropMessage(6, "请输入正确的地图索引");
                 }
+            } else {
+                c.getPlayer().message("找到多个地图，请输入索引选择地图:");
+                for (int i = 0; i < results.size(); i++) {
+                    Map.Entry<String, String> map = results.get(i);
+                    c.getPlayer().message(String.format("[%d] %s", i, map.getKey()));
+                }
             }
         }
     }

@@ -414,5 +414,7 @@ public class CommandsExecutor {
         addCommand("mapdrop", 0, MelonCommand.MapDrop.class);
         addCommand("vacon", 0, MelonCommand.MobVac.class);
         addCommand("vacoff", 0, MelonCommand.MobVacStop.class);
+        addCommand("to", 0 , MelonCommand.To.class);
+        addCommand("renqi", 0 , MelonCommand.RenQi.class);
     }
 }

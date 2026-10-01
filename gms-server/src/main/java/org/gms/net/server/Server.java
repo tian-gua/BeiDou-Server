@@ -668,6 +668,7 @@ public class Server {
     }
 
     //游戏启动
+    // #游戏启动#
     public void init() {
         Instant beforeInit = Instant.now();
         log.info(I18nUtil.getLogMessage("Server.init.info1"), ServerConstants.VERSION);

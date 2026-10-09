@@ -9,12 +9,15 @@ import org.gms.client.inventory.manipulator.InventoryManipulator;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.server.ItemInformationProvider;
 import org.gms.util.I18nUtil;
+import org.gms.util.PacketCreator;
 import org.gms.util.Randomizer;
 
 @Slf4j
 public class EquipEnhanceHandler {
 
     private static final ItemInformationProvider ii = ItemInformationProvider.getInstance();
+
+    public static int continueFailureCount = 0; // 连续升星失败次数
 
     public static void enhance(Character player, int maxStar, boolean useProtectScroll) {
         // 获取装备背包第一格的装备
@@ -163,6 +166,7 @@ public class EquipEnhanceHandler {
             }
             InventoryManipulator.addFromDrop(player.getClient(), newEquip, false);
             player.message("升星成功，装备 " + equipName + " 星级提升至 " + (star + 1) + " 星");
+            continueFailureCount = 0; // 重置连续升星失败次数
         } else {
             if (useProtectScroll) {
                 player.message("装备 " + equipName + " 升星失败，已被祝福卷轴保护，装备未被销毁");
@@ -171,7 +175,8 @@ public class EquipEnhanceHandler {
                 if (rand >= 70) {
                     player.message("装备 " + equipName + " 升星失败，但幸运地保留了装备");
                 } else {
-                    player.message("装备 " + equipName + " 升星失败，已被销毁");
+                    continueFailureCount++; // 增加连续升星失败次数
+                    player.message("装备 " + equipName + " 升星失败，已被销毁, 连续升星失败次数: " + continueFailureCount);
                     InventoryManipulator.removeFromSlot(
                             player.getClient(),
                             InventoryType.EQUIP,
@@ -180,7 +185,6 @@ public class EquipEnhanceHandler {
                             false,
                             false
                     );
-
                 }
             }
         }

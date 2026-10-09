@@ -43,7 +43,7 @@ public class MelonConfig {
             Map.entry("use_add_slots_by_level", true), // 每20级增加背包栏位
             Map.entry("use_fast_dojo_upgrade", true), // 减少道场腰带升级需要的点数
             Map.entry("use_enable_party_level_limit_lift", true), // 是否解除组队副本默认等级范围限制，开启时允许任意等级的玩家进入副本
-
+            Map.entry("use_enable_full_respawn", true), // 怪物按最大数量生成
             Map.entry("test", true) // 占位符
     );
 

@@ -2029,7 +2029,10 @@ public class MapleMap {
 
         spawnAndAddRangedMapObject(monster, c -> c.sendPacket(PacketCreator.spawnMonster(monster, true)), null);
 
-        monster.aggroUpdateController();
+        // #吸怪时，怪物默认没有主控，这样怪物就不会乱跑了#
+        if (vacPoint == null || monster.isBoss()) {
+            monster.aggroUpdateController();
+        }
         updateBossSpawn(monster);
 
         if ((monster.getTeam() == 1 || monster.getTeam() == 0) && (isCPQMap() || isCPQMap2())) {
